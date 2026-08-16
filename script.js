@@ -1,4 +1,4 @@
-import { siteCardConfig } from "./site-config.js";
+import { siteCardConfig } from "./site-config.js?v=20260816-ict-card-4";
 
 const state = {
   sites: [],

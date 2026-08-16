@@ -108,5 +108,32 @@ export const siteCardConfig = {
         aura: "#f6c9d2",
       },
     },
+
+    计算所: {
+      scoreFile: "scores/ict.md",
+      variant: "ict-watercolor",
+      image: {
+        src: "images/ict-cover.png",
+        position: "center",
+      },
+      theme: {
+        color: "#355d72",
+        aura: "#dce8ec",
+      },
+      monogram: "计算所",
+      identity: {
+        code: "CAS · ICT",
+        subtitle: "院所专题 · 2026",
+      },
+      titleParts: [
+        { className: "ict-title-academy", text: "中国科学院" },
+        { className: "ict-title-name", text: "计算技术研究所" },
+        {
+          className: "ict-title-english",
+          text: "INSTITUTE OF COMPUTING TECHNOLOGY",
+        },
+      ],
+      linkLabel: "进入专题",
+    },
   },
 };

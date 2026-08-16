@@ -1185,6 +1185,198 @@ svg {
   height: 16px;
 }
 
+/* 计算所：利用水彩封面的左侧纸面留白排版，完整保留右侧建筑主体。 */
+.site-card--ict-watercolor {
+  border: 1px solid rgba(55, 78, 88, 0.18);
+  background-color: #eee4cf;
+  background-position: var(--card-cover-position, center);
+  box-shadow: 0 14px 34px rgba(48, 62, 68, 0.16);
+}
+
+.site-card--ict-watercolor::before {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(250, 243, 226, 0.98) 0%,
+      rgba(250, 243, 226, 0.9) 34%,
+      rgba(250, 243, 226, 0.46) 54%,
+      rgba(250, 243, 226, 0) 72%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 58%, rgba(38, 54, 61, 0.12));
+}
+
+.site-card--ict-watercolor:hover {
+  border-color: rgba(53, 93, 114, 0.32);
+  background-color: #eee4cf;
+  background-image: var(--card-cover);
+  background-position: var(--card-cover-position, center);
+  background-size: cover;
+  box-shadow: 0 20px 46px rgba(48, 62, 68, 0.24);
+}
+
+.site-card--ict-watercolor .site-monogram {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  background: none;
+  color: #355d72;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  box-shadow: none;
+  text-shadow: none;
+  transform: none;
+}
+
+.site-card--ict-watercolor .site-health {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(53, 93, 114, 0.16);
+  background: rgba(250, 243, 226, 0.82);
+  color: #435d69;
+  font-size: 0.7rem;
+  box-shadow: 0 5px 14px rgba(48, 62, 68, 0.08);
+  text-shadow: none;
+  backdrop-filter: blur(8px);
+  transform: none;
+}
+
+.site-card--ict-watercolor .site-health.is-online {
+  color: #286044;
+}
+
+.site-card--ict-watercolor .site-health.is-offline {
+  color: #8a3a32;
+}
+
+.site-card--ict-watercolor .site-health .health-dot {
+  box-shadow: 0 0 0 4px rgba(53, 93, 114, 0.1);
+}
+
+.site-card--ict-watercolor .institute-identity {
+  position: absolute;
+  top: 70px;
+  left: 26px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(41, 75, 93, 0.72);
+}
+
+.site-card--ict-watercolor .institute-identity-rule {
+  width: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, #51758a, rgba(81, 117, 138, 0.18));
+}
+
+.site-card--ict-watercolor .institute-identity-copy {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  line-height: 1;
+}
+
+.site-card--ict-watercolor .institute-identity-copy strong,
+.site-card--ict-watercolor .institute-identity-copy small {
+  font-family: Georgia, "Times New Roman", "Songti SC", STSong, serif;
+  font-size: 0.56rem;
+  letter-spacing: 0;
+}
+
+.site-card--ict-watercolor .institute-identity-copy strong {
+  font-weight: 700;
+}
+
+.site-card--ict-watercolor .institute-identity-copy small {
+  padding-left: 7px;
+  border-left: 1px solid rgba(41, 75, 93, 0.24);
+  color: rgba(41, 75, 93, 0.58);
+}
+
+.site-card--ict-watercolor .site-content {
+  max-width: 62%;
+  margin-top: 30px;
+  padding-top: 0;
+}
+
+.site-card--ict-watercolor .site-content h3 {
+  display: flex;
+  margin: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #294b5d;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.68);
+}
+
+.site-card--ict-watercolor .ict-title-academy {
+  color: #526e7b;
+  font-family: "Songti SC", "Noto Serif CJK SC", STSong, serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.site-card--ict-watercolor .ict-title-name {
+  margin-top: 6px;
+  font-family: "Songti SC", "Noto Serif CJK SC", STSong, serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: 0;
+}
+
+.site-card--ict-watercolor .ict-title-english {
+  max-width: 170px;
+  margin-top: 8px;
+  color: rgba(41, 75, 93, 0.68);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.site-card--ict-watercolor .site-description {
+  display: -webkit-box;
+  max-width: 210px;
+  margin-top: 13px;
+  color: rgba(41, 75, 93, 0.78);
+  font-size: 0.76rem;
+  line-height: 1.55;
+  text-shadow: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.site-card--ict-watercolor .site-link {
+  min-height: 34px;
+  margin: auto 0 2px;
+  padding: 0;
+  align-self: flex-start;
+  background: none;
+  color: #294b5d;
+  font-size: 0.78rem;
+  font-weight: 700;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.site-card--ict-watercolor .site-link:hover {
+  color: #173c50;
+  text-decoration: underline;
+  text-decoration-color: rgba(41, 75, 93, 0.5);
+  text-underline-offset: 4px;
+}
+
+.site-card--ict-watercolor .site-link svg {
+  width: 16px;
+  height: 16px;
+}
+
 .card-topline {
   position: relative;
   z-index: 1;
