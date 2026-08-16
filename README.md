@@ -98,4 +98,4 @@ python3 -m http.server 4173
 https://cskaoyan.cn/sitemap.xml
 ```
 
-欢迎通过 [GitHub 仓库](https://github.com/Wzhongkai/cskaoyan-cn) 提交 Issue 或 Pull Request，补充站点、修正介绍或改进页面。
+欢迎通过 [GitHub 仓库](https://github.com/ucas-cskaoyan-web/cskaoyan-cn) 提交 Issue 或 Pull Request，补充站点、修正介绍或改进页面。
