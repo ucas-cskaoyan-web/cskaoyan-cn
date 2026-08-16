@@ -20,7 +20,7 @@ export const siteCardConfig = {
       scoreFile: "scores/iie.md",
       variant: "institute-featured",
       image: {
-        src: "images/iie-cover.jpg",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzHXQ.jpg",
         position: "center 12%",
       },
       theme: {
@@ -46,7 +46,7 @@ export const siteCardConfig = {
       scoreFile: "scores/iscas.md",
       variant: "cover",
       image: {
-        src: "images/iscas-cover.jpg",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzxhV.jpg",
         position: "center 10%",
       },
       theme: {
@@ -59,7 +59,7 @@ export const siteCardConfig = {
       scoreFile: "scores/sict.md",
       variant: "title-only",
       image: {
-        src: "images/sict-campus-cover-v5.jpg",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzO7n.jpg",
         position: "center",
       },
       theme: {
@@ -76,7 +76,7 @@ export const siteCardConfig = {
     华大: {
       scoreFile: "scores/bgi.md",
       image: {
-        src: "images/bgi-cover.jpg",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzqmj.jpg",
         position: "center",
       },
       theme: {
@@ -88,7 +88,7 @@ export const siteCardConfig = {
     杭高院: {
       scoreFile: "scores/hias.md",
       image: {
-        src: "images/hias-cover.png",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzjkq.png",
       },
       theme: {
         color: "#386a20",
@@ -100,7 +100,7 @@ export const siteCardConfig = {
       scoreFile: "scores/cnic.md",
       variant: "cover",
       image: {
-        src: "images/cnic-cover.jpg",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzL0s.jpg",
         position: "center",
       },
       theme: {
@@ -113,7 +113,7 @@ export const siteCardConfig = {
       scoreFile: "scores/ict.md",
       variant: "ict-watercolor",
       image: {
-        src: "images/ict-cover.png",
+        src: "https://s41.ax1x.com/2026/08/16/pmXzvt0.png",
         position: "center",
       },
       theme: {
