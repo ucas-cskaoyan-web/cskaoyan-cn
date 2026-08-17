@@ -26,6 +26,7 @@ export const siteCardConfig = {
       variant: "institute-featured",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzHXQ.jpg",
+        fallbackSrc: "images/iie-cover.jpg",
         position: "center 12%",
       },
       theme: {
@@ -53,6 +54,7 @@ export const siteCardConfig = {
       variant: "cover",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzxhV.jpg",
+        fallbackSrc: "images/iscas-cover.jpg",
         position: "center 10%",
       },
       theme: {
@@ -67,6 +69,7 @@ export const siteCardConfig = {
       variant: "title-only",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzO7n.jpg",
+        fallbackSrc: "images/sict-cover.jpg",
         position: "center",
       },
       theme: {
@@ -85,6 +88,7 @@ export const siteCardConfig = {
       scoreFile: "scores/bgi.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzqmj.jpg",
+        fallbackSrc: "images/bgi-cover.jpg",
         position: "center",
       },
       theme: {
@@ -98,6 +102,7 @@ export const siteCardConfig = {
       scoreFile: "scores/hias.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzjkq.png",
+        fallbackSrc: "images/hias-cover.png",
       },
       theme: {
         color: "#386a20",
@@ -111,6 +116,7 @@ export const siteCardConfig = {
       variant: "cover",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzL0s.jpg",
+        fallbackSrc: "images/cnic-cover.jpg",
         position: "center",
       },
       theme: {
@@ -125,6 +131,7 @@ export const siteCardConfig = {
       variant: "ict-watercolor",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzvt0.png",
+        fallbackSrc: "images/ict-cover.png",
         position: "center",
       },
       theme: {

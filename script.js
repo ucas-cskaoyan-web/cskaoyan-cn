@@ -1,9 +1,10 @@
-import { siteCardConfig } from "./site-config.js?v=20260817-click-counter-1";
+import { siteCardConfig } from "./site-config.js?v=20260817-image-fallback-1";
 
 const state = {
   sites: [],
   health: new Map(),
   clickCounts: new Map(),
+  lastClickAt: new Map(),
   scoreRows: [],
 };
 
@@ -31,6 +32,22 @@ const elements = {
 
 const configuredCards = siteCardConfig ?? {};
 const clickCounterApi = configuredCards.clickCounter?.apiBaseUrl?.replace(/\/$/, "") || "";
+const clickVisitorId = getClickVisitorId();
+
+function getClickVisitorId() {
+  const storageKey = "cskaoyan-click-visitor";
+  try {
+    const existing = window.localStorage.getItem(storageKey);
+    if (existing) return existing;
+
+    const generated = globalThis.crypto?.randomUUID?.()
+      || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(storageKey, generated);
+    return generated;
+  } catch {
+    return "session";
+  }
+}
 const fallbackTheme = { color: "#6750a4", aura: "#eaddff" };
 const defaultCard = {
   variant: "standard",
@@ -38,6 +55,48 @@ const defaultCard = {
   ...configuredCards.defaults,
   theme: configuredCards.defaults?.theme || fallbackTheme,
 };
+const cardCoverTimeoutMs = 5_000;
+const cardCoverProbes = new WeakMap();
+
+function cardCoverUrl(value) {
+  const escaped = String(value).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return `url("${escaped}")`;
+}
+
+function applyCardCover(card, image) {
+  const primarySrc = image?.src;
+  if (!primarySrc) return;
+
+  card.classList.add("site-card--cover");
+  card.style.setProperty("--card-cover", cardCoverUrl(primarySrc));
+  card.style.setProperty("--card-cover-position", image.position || "center");
+  card.dataset.coverSource = "primary";
+
+  const fallbackSrc = image.fallbackSrc;
+  if (!fallbackSrc || fallbackSrc === primarySrc) return;
+
+  const probe = new Image();
+  let settled = false;
+  const useFallback = () => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    cardCoverProbes.delete(card);
+    card.style.setProperty("--card-cover", cardCoverUrl(fallbackSrc));
+    card.dataset.coverSource = "fallback";
+  };
+  const timeout = window.setTimeout(useFallback, cardCoverTimeoutMs);
+
+  probe.addEventListener("load", () => {
+    if (settled) return;
+    settled = true;
+    window.clearTimeout(timeout);
+    cardCoverProbes.delete(card);
+  }, { once: true });
+  probe.addEventListener("error", useFallback, { once: true });
+  cardCoverProbes.set(card, probe);
+  probe.src = primarySrc;
+}
 
 function normalizeMarkdownLink(line) {
   const nestedLink = line.match(/^\[\[([^\]]+)\]\((https?:\/\/[^)]+)\)\]\((https?:\/\/[^)]+)\)\s*$/);
@@ -474,6 +533,11 @@ async function loadClickCounts(sites) {
 function trackSiteClick(counterId) {
   if (!clickCounterApi || !counterId) return;
 
+  const now = Date.now();
+  const lastClick = state.lastClickAt.get(counterId) || 0;
+  if (now - lastClick < 10_000) return;
+  state.lastClickAt.set(counterId, now);
+
   const current = state.clickCounts.get(counterId);
   if (Number.isFinite(current)) {
     const next = current + 1;
@@ -481,8 +545,9 @@ function trackSiteClick(counterId) {
     updateClickCount(counterId, next);
   }
 
-  const endpoint = `${clickCounterApi}/click/${encodeURIComponent(counterId)}`;
-  if (navigator.sendBeacon?.(endpoint)) return;
+  const endpoint = new URL(`${clickCounterApi}/click/${encodeURIComponent(counterId)}`);
+  endpoint.searchParams.set("visitor", clickVisitorId);
+  if (navigator.sendBeacon?.(endpoint.toString())) return;
 
   fetch(endpoint, {
     method: "POST",
@@ -582,11 +647,7 @@ function configureCard(card, site) {
   card.style.setProperty("--card-color", theme.color);
   card.style.setProperty("--card-aura", theme.aura);
 
-  if (config.image?.src) {
-    card.classList.add("site-card--cover");
-    card.style.setProperty("--card-cover", `url("${config.image.src}")`);
-    card.style.setProperty("--card-cover-position", config.image.position || "center");
-  }
+  applyCardCover(card, config.image);
 
   card.querySelector(".site-monogram").textContent = config.monogram ?? site.shortName;
   appendIdentity(card, config.identity);

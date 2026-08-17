@@ -38,7 +38,8 @@ profiles: {
   新院所: {
     variant: "cover",
     image: {
-      src: "images/new-cover.jpg",
+      src: "https://image-host.example/new-cover.jpg",
+      fallbackSrc: "images/new-cover.jpg",
       position: "center 20%",
     },
     theme: {
@@ -53,7 +54,7 @@ profiles: {
 可用字段：
 
 - `variant`：内置 `standard`、`cover`、`title-only`、`institute-featured`。
-- `image.src`：封面路径；`image.position`：图片裁切位置，例如 `center 20%`。
+- `image.src`：优先加载的图床地址；`image.fallbackSrc`：图床失败或 5 秒超时后使用的站内备用图片；`image.position`：图片裁切位置，例如 `center 20%`。
 - `theme`：卡片主题色 `color` 和光晕色 `aura`。
 - `monogram`：左上角简称，默认使用 `sites.md` 的二级标题。
 - `titleParts`：分段标题数组，每项包含 `className` 和 `text`。
@@ -93,6 +94,8 @@ python3 -m http.server 4173
 ## 卡片点击量
 
 卡片点击量由 `counter-worker/` 下的 Cloudflare Worker 记录，并保存在 D1 数据库中。首页只统计用户从卡片进入专题站的点击，不读取目标网站访问量。
+
+点击接口带有多层轻量防刷：同一浏览器同一卡片 10 秒内只上报一次；Cloudflare 在边缘节点限制突发请求；D1 再按浏览器标识和 IP 精确限制为每张卡片每分钟最多接受 5 次。此外，同一浏览器或同一 IP 跨所有院所卡片每个自然小时最多记录 10 次，并按北京时间每天最多记录 20 次。超过任一限制都不会增加点击量，并返回 `429`。IP 只参与带密钥的哈希计算，数据库不保存明文 IP。限流是反滥用措施，不是严格的审计计数；代理池或大量真实设备仍可能绕过。
 
 新增院所时需要完成两项配置：
 

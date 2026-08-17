@@ -4,6 +4,24 @@
   "main": "src/index.js",
   "compatibility_date": "2026-08-17",
   "workers_dev": true,
+  "ratelimits": [
+    {
+      "name": "CARD_CLICK_RATE_LIMIT",
+      "namespace_id": "917301",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    },
+    {
+      "name": "CARD_IP_RATE_LIMIT",
+      "namespace_id": "917302",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",
