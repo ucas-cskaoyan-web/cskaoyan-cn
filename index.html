@@ -47,7 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260816-ict-card-4" />
+    <link rel="stylesheet" href="styles.css?v=20260817-click-counter-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -74,7 +74,7 @@
         ]
       }
     </script>
-    <script type="module" src="script.js?v=20260816-image-host-2"></script>
+    <script type="module" src="script.js?v=20260817-click-counter-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#sites">跳到站点列表</a>
@@ -316,10 +316,15 @@
       <article class="site-card">
         <div class="card-topline">
           <div class="site-monogram" aria-hidden="true"></div>
-          <span class="site-health is-checking" title="正在检测网站连通性">
-            <span class="health-dot" aria-hidden="true"></span>
-            <span class="health-label">检测中</span>
-          </span>
+          <div class="site-statuses">
+            <span class="site-health is-checking" title="正在检测网站连通性">
+              <span class="health-dot" aria-hidden="true"></span>
+              <span class="health-label">检测中</span>
+            </span>
+            <span class="site-click-count is-loading" aria-live="polite" title="正在读取卡片点击量">
+              读取点击量
+            </span>
+          </div>
         </div>
         <div class="site-content">
           <h3></h3>

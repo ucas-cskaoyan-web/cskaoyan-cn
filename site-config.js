@@ -6,6 +6,10 @@
  * defaults，不会影响其他卡片。
  */
 export const siteCardConfig = {
+  clickCounter: {
+    apiBaseUrl: "https://cskaoyan-card-clicks.ucas-cskaoyan-web.workers.dev",
+  },
+
   defaults: {
     variant: "standard",
     linkLabel: "访问站点",
@@ -17,6 +21,7 @@ export const siteCardConfig = {
 
   profiles: {
     信工所: {
+      counterId: "iie",
       scoreFile: "scores/iie.md",
       variant: "institute-featured",
       image: {
@@ -43,6 +48,7 @@ export const siteCardConfig = {
     },
 
     软件所: {
+      counterId: "iscas",
       scoreFile: "scores/iscas.md",
       variant: "cover",
       image: {
@@ -56,6 +62,7 @@ export const siteCardConfig = {
     },
 
     沈计所: {
+      counterId: "sict",
       scoreFile: "scores/sict.md",
       variant: "title-only",
       image: {
@@ -74,6 +81,7 @@ export const siteCardConfig = {
     },
 
     华大: {
+      counterId: "bgi",
       scoreFile: "scores/bgi.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzqmj.jpg",
@@ -86,6 +94,7 @@ export const siteCardConfig = {
     },
 
     杭高院: {
+      counterId: "hias",
       scoreFile: "scores/hias.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzjkq.png",
@@ -97,6 +106,7 @@ export const siteCardConfig = {
     },
 
     网信中心: {
+      counterId: "cnic",
       scoreFile: "scores/cnic.md",
       variant: "cover",
       image: {
@@ -110,6 +120,7 @@ export const siteCardConfig = {
     },
 
     计算所: {
+      counterId: "ict",
       scoreFile: "scores/ict.md",
       variant: "ict-watercolor",
       image: {

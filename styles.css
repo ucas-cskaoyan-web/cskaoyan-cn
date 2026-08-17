@@ -1546,6 +1546,58 @@ svg {
   box-shadow: var(--shadow-one);
 }
 
+.site-statuses {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.site-click-count {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  display: inline-flex;
+  min-height: 22px;
+  padding: 0 9px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 251, 254, 0.78);
+  color: var(--md-on-surface-variant);
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 1px rgba(121, 116, 126, 0.14);
+  backdrop-filter: blur(8px);
+}
+
+.site-click-count.is-loading,
+.site-click-count.is-unavailable {
+  color: rgba(73, 69, 79, 0.72);
+  font-weight: 500;
+}
+
+.site-card--cover .site-click-count {
+  background: rgba(17, 20, 28, 0.38);
+  color: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.site-card--title-only .site-click-count,
+.site-card--ict-watercolor .site-click-count {
+  background: rgba(250, 243, 226, 0.84);
+  color: #435d69;
+  box-shadow: inset 0 0 0 1px rgba(53, 93, 114, 0.14);
+  text-shadow: none;
+}
+
+.site-card--title-only .site-content {
+  max-width: calc(100% - 92px);
+}
+
 .about-copy {
   min-width: 0;
 }

@@ -1,0 +1,13 @@
+{
+  "name": "cskaoyan-card-clicks",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:apply": "wrangler d1 execute cskaoyan-card-clicks --remote --file=./schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^4.123.0"
+  }
+}

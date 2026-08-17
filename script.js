@@ -1,8 +1,9 @@
-import { siteCardConfig } from "./site-config.js?v=20260816-image-host-2";
+import { siteCardConfig } from "./site-config.js?v=20260817-click-counter-1";
 
 const state = {
   sites: [],
   health: new Map(),
+  clickCounts: new Map(),
   scoreRows: [],
 };
 
@@ -29,6 +30,7 @@ const elements = {
 };
 
 const configuredCards = siteCardConfig ?? {};
+const clickCounterApi = configuredCards.clickCounter?.apiBaseUrl?.replace(/\/$/, "") || "";
 const fallbackTheme = { color: "#6750a4", aura: "#eaddff" };
 const defaultCard = {
   variant: "standard",
@@ -428,6 +430,68 @@ function applyHealthState(siteId, status) {
   });
 }
 
+function formatClickCount(value) {
+  return `${Number(value).toLocaleString("zh-CN")} 次点击`;
+}
+
+function updateClickCount(counterId, value, stateName = "ready") {
+  document.querySelectorAll(`[data-counter-id="${counterId}"]`).forEach((badge) => {
+    badge.classList.remove("is-loading", "is-ready", "is-unavailable");
+    badge.classList.add(`is-${stateName}`);
+
+    if (stateName === "ready") {
+      badge.textContent = formatClickCount(value);
+      badge.title = `该卡片累计被点击 ${Number(value).toLocaleString("zh-CN")} 次`;
+    } else if (stateName === "unavailable") {
+      badge.textContent = "点击量暂缺";
+      badge.title = "暂时无法读取卡片点击量";
+    } else {
+      badge.textContent = "读取点击量";
+      badge.title = "正在读取卡片点击量";
+    }
+  });
+}
+
+async function loadClickCounts(sites) {
+  const counterIds = sites.map((site) => site.card.counterId).filter(Boolean);
+  if (!clickCounterApi || !counterIds.length) return;
+
+  try {
+    const response = await fetch(`${clickCounterApi}/counts`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const counts = await response.json();
+    counterIds.forEach((counterId) => {
+      const value = Number(counts[counterId] || 0);
+      state.clickCounts.set(counterId, value);
+      updateClickCount(counterId, value);
+    });
+  } catch {
+    counterIds.forEach((counterId) => updateClickCount(counterId, 0, "unavailable"));
+  }
+}
+
+function trackSiteClick(counterId) {
+  if (!clickCounterApi || !counterId) return;
+
+  const current = state.clickCounts.get(counterId);
+  if (Number.isFinite(current)) {
+    const next = current + 1;
+    state.clickCounts.set(counterId, next);
+    updateClickCount(counterId, next);
+  }
+
+  const endpoint = `${clickCounterApi}/click/${encodeURIComponent(counterId)}`;
+  if (navigator.sendBeacon?.(endpoint)) return;
+
+  fetch(endpoint, {
+    method: "POST",
+    mode: "cors",
+    cache: "no-store",
+    keepalive: true,
+  }).catch(() => {});
+}
+
 function updateHealthBadge(badge, status) {
   badge.classList.remove("is-checking", "is-online", "is-offline");
   badge.classList.add(`is-${status}`);
@@ -541,6 +605,13 @@ function renderSiteCard(site) {
   const knownHealth = state.health.get(site.order);
   if (knownHealth) updateHealthBadge(node.querySelector(".site-health"), knownHealth);
 
+  const clickCount = node.querySelector(".site-click-count");
+  if (config.counterId) {
+    clickCount.dataset.counterId = config.counterId;
+  } else {
+    clickCount.hidden = true;
+  }
+
   const description = node.querySelector(".site-description");
   site.description.forEach((paragraph) => {
     const p = document.createElement("p");
@@ -552,6 +623,7 @@ function renderSiteCard(site) {
   link.href = site.url;
   link.setAttribute("aria-label", `访问 ${site.name}`);
   link.firstChild.textContent = `${config.linkLabel || "访问站点"} `;
+  link.addEventListener("click", () => trackSiteClick(config.counterId));
   return node;
 }
 
@@ -564,6 +636,7 @@ function renderSites() {
   sites.forEach((site) => fragment.append(renderSiteCard(site)));
   elements.grid.append(fragment);
   elements.grid.hidden = sites.length === 0;
+  loadClickCounts(sites);
   sites.forEach(checkSiteHealth);
 }
 

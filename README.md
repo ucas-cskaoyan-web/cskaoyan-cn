@@ -13,6 +13,7 @@
 | `styles.css` | 页面基础样式和卡片变体样式 |
 | `images/` | 卡片封面等图片资源 |
 | `index.html` | 页面骨架、SEO 元数据和卡片模板 |
+| `counter-worker/` | Cloudflare Worker + D1 卡片点击量服务 |
 
 ## 添加院校
 
@@ -58,6 +59,7 @@ profiles: {
 - `titleParts`：分段标题数组，每项包含 `className` 和 `text`。
 - `identity`：特色封面顶部信息，支持 `code` 和 `subtitle`。
 - `linkLabel`：卡片底部入口文字。
+- `counterId`：点击量统计 ID，需要同时存在于 `counter-worker/src/index.js` 的允许列表中。
 
 要新增完全不同的视觉变体，在 `styles.css` 的“卡片变体”区域添加 `.site-card--变体名`，再把 profile 的 `variant` 设置为同名值。渲染脚本不需要增加院校名称判断。
 
@@ -87,6 +89,26 @@ python3 -m http.server 4173
 ```
 
 然后打开 [http://localhost:4173/](http://localhost:4173/)。不要直接双击 `index.html`，否则浏览器会拦截 `file://` 页面中的模块和 Markdown 请求。
+
+## 卡片点击量
+
+卡片点击量由 `counter-worker/` 下的 Cloudflare Worker 记录，并保存在 D1 数据库中。首页只统计用户从卡片进入专题站的点击，不读取目标网站访问量。
+
+新增院所时需要完成两项配置：
+
+- 在 `site-config.js` 对应 profile 中增加唯一的 `counterId`。
+- 在 `counter-worker/src/index.js` 的 `SITE_IDS` 中加入同一个 ID。
+
+修改 Worker 后，在 WSL 中部署：
+
+```bash
+cd counter-worker
+npm install
+npm run db:apply
+npm run deploy
+```
+
+`db:apply` 用于创建或更新表结构，不会清空已有点击量。线上接口地址配置在 `site-config.js` 的 `clickCounter.apiBaseUrl`。
 
 ## 部署
 

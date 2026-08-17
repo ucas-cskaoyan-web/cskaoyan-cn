@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cskaoyan-card-clicks",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-17",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cskaoyan-card-clicks",
+      "database_id": "ad401723-db8c-4b49-a40f-d7fe3b74e67f"
+    }
+  ]
+}
