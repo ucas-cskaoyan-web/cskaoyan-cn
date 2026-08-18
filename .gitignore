@@ -10,4 +10,4 @@ source-server/.env
 source-server/data/
 source-server/images/
 source-server/__pycache__/
-counter-tencent/node_modules/
+artifacts/

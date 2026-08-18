@@ -94,32 +94,11 @@ python3 -m http.server 4173
 
 ## 卡片点击量
 
-卡片点击量由 `counter-tencent/` 下的 Tencent CloudBase HTTP 云函数记录，并保存在 NoSQL 数据库中。首页只统计用户从卡片进入专题站的点击，不读取目标网站访问量。网页端只包含公开的 HTTPS 接口地址，不包含 CloudBase API Key、限流密钥或任何云端凭据。
+首页只统计用户从卡片进入专题站的点击，不读取目标网站访问量。前端通过 `site-config.js` 中的公开 HTTPS 接口读取和上报数据，不包含数据库凭据、服务端密钥或其他私密配置。
 
-点击接口带有多层轻量防刷：同一浏览器同一卡片 10 秒内只上报一次；Cloudflare 在边缘节点限制突发请求；D1 再按浏览器标识和 IP 精确限制为每张卡片每分钟最多接受 5 次。此外，同一浏览器或同一 IP 跨所有院所卡片每个自然小时最多记录 10 次，并按北京时间每天最多记录 20 次。超过任一限制都不会增加点击量，并返回 `429`。IP 只参与带密钥的哈希计算，数据库不保存明文 IP。限流是反滥用措施，不是严格的审计计数；代理池或大量真实设备仍可能绕过。
+访问量数据经过简单的防刷验证，不确保其完全准确。接口由独立的私有后端维护，服务端源码和运行配置不属于 GitHub Pages 部署内容。
 
-新增院所时需要完成两项配置：
-
-- 在 `site-config.js` 对应 profile 中增加唯一的 `counterId`。
-- 在 `counter-tencent/index.js` 的 `SITE_IDS` 中加入同一个 ID，并在数据库中创建对应文档。
-
-修改云函数后，在 WSL 中仅更新代码：
-
-```bash
-cd counter-tencent
-npm install
-tcb fn code update cskaoyan-counter --dir . --deployMode cos
-```
-
-不要把 `CLOUDBASE_APIKEY` 或 `RATE_LIMIT_SECRET` 写入仓库、前端代码、`cloudbaserc.json` 或 README。它们只在 CloudBase 云函数的环境变量中配置；`TCB_ENV_ID` 可以写入配置文件，因为它是环境标识而不是凭据。线上接口地址配置在 `site-config.js` 的 `clickCounter.apiBaseUrl`。
-
-部署前可在本地检查：
-
-```bash
-git grep -n -E 'CLOUDBASE_APIKEY|SECRETID|SECRETKEY|SECRET_KEY|PRIVATE_KEY|RATE_LIMIT_SECRET' -- ':!node_modules'
-```
-
-命令应只匹配服务端代码中对环境变量名称的引用，不应出现任何密钥值。
+新增院所时，在 `site-config.js` 对应 profile 中增加唯一的 `counterId`，并同步维护私有后端的院所标识。
 
 ## 自建图片与计数服务
 
@@ -158,13 +137,13 @@ docker exec cskaoyan-source python -c \
   'import sqlite3; src=sqlite3.connect("/data/counter.db"); dst=sqlite3.connect("/data/counter-backup.db"); src.backup(dst); dst.close(); src.close()'
 ```
 
-截至 2026 年 8 月 18 日，容器、图片、SQLite、限流和 Nginx HTTP 虚拟主机已经部署。该计数实现目前只作为备用方案，正式环境使用 Tencent CloudBase。阿里云公网目前以 `Non-compliance ICP Filing` 拦截新子域名，因此网站暂不把它作为稳定图片源。完成 `source.cskaoyan.cn` 的阿里云备案接入后，在服务器运行：
+截至 2026 年 8 月 18 日，容器、图片、SQLite、限流和 Nginx HTTP 虚拟主机已经部署。该计数实现目前只作为备用方案，正式环境使用独立统计服务。阿里云公网目前以 `Non-compliance ICP Filing` 拦截新子域名，因此网站暂不把它作为稳定图片源。完成 `source.cskaoyan.cn` 的阿里云备案接入后，在服务器运行：
 
 ```bash
 certbot --nginx -d source.cskaoyan.cn --redirect
 ```
 
-确认 HTTPS 的 `/health` 和图片接口均可访问后，可继续把 `https://source.cskaoyan.cn/img/<文件名>` 保留为每张卡片的 `image.serverSrc`。正式计数接口继续使用 Tencent CloudBase；只有明确迁移统计服务时才修改 `clickCounter.apiBaseUrl`。本地图像 `fallbackSrc` 继续保留。
+确认 HTTPS 的 `/health` 和图片接口均可访问后，可继续把 `https://source.cskaoyan.cn/img/<文件名>` 保留为每张卡片的 `image.serverSrc`。正式计数接口继续使用当前独立统计服务；只有明确迁移时才修改 `clickCounter.apiBaseUrl`。本地图像 `fallbackSrc` 继续保留。
 
 ## 部署
 

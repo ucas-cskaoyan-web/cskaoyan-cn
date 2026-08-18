@@ -4,6 +4,7 @@ const state = {
   sites: [],
   health: new Map(),
   clickCounts: new Map(),
+  heatCounts: new Map(),
   lastClickAt: new Map(),
   scoreRows: [],
 };
@@ -517,6 +518,10 @@ function formatClickCount(value) {
   return `${Number(value).toLocaleString("zh-CN")} 次点击`;
 }
 
+function formatHeat(value) {
+  return `${Number(value).toLocaleString("zh-CN")} 热度`;
+}
+
 function updateClickCount(counterId, value, stateName = "ready") {
   document.querySelectorAll(`[data-counter-id="${counterId}"]`).forEach((badge) => {
     badge.classList.remove("is-loading", "is-ready", "is-unavailable");
@@ -535,6 +540,24 @@ function updateClickCount(counterId, value, stateName = "ready") {
   });
 }
 
+function updateHeat(counterId, value, stateName = "ready") {
+  document.querySelectorAll(`[data-heat-counter-id="${counterId}"]`).forEach((badge) => {
+    badge.classList.remove("is-loading", "is-ready", "is-unavailable");
+    badge.classList.add(`is-${stateName}`);
+
+    if (stateName === "ready") {
+      badge.textContent = formatHeat(value);
+      badge.title = "站点访问热度";
+    } else if (stateName === "unavailable") {
+      badge.textContent = "热度暂缺";
+      badge.title = "暂时无法读取站点热度";
+    } else {
+      badge.textContent = "读取热度";
+      badge.title = "正在读取站点热度";
+    }
+  });
+}
+
 async function loadClickCounts(sites) {
   const counterIds = sites.map((site) => site.card.counterId).filter(Boolean);
   if (!clickCounterApi || !counterIds.length) return;
@@ -544,13 +567,20 @@ async function loadClickCounts(sites) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const counts = await response.json();
+    const heat = counts.heat || {};
     counterIds.forEach((counterId) => {
-      const value = Number(counts[counterId] || 0);
-      state.clickCounts.set(counterId, value);
-      updateClickCount(counterId, value);
+      const clicks = Number(counts[counterId] || 0);
+      const heatValue = Number(heat[counterId] || 0);
+      state.clickCounts.set(counterId, clicks);
+      state.heatCounts.set(counterId, heatValue);
+      updateClickCount(counterId, clicks);
+      updateHeat(counterId, heatValue);
     });
   } catch {
-    counterIds.forEach((counterId) => updateClickCount(counterId, 0, "unavailable"));
+    counterIds.forEach((counterId) => {
+      updateClickCount(counterId, 0, "unavailable");
+      updateHeat(counterId, 0, "unavailable");
+    });
   }
 }
 
@@ -562,23 +592,29 @@ function trackSiteClick(counterId) {
   if (now - lastClick < 10_000) return;
   state.lastClickAt.set(counterId, now);
 
-  const current = state.clickCounts.get(counterId);
-  if (Number.isFinite(current)) {
-    const next = current + 1;
-    state.clickCounts.set(counterId, next);
-    updateClickCount(counterId, next);
-  }
-
   const endpoint = new URL(`${clickCounterApi}/click/${encodeURIComponent(counterId)}`);
   endpoint.searchParams.set("visitor", clickVisitorId);
-  if (navigator.sendBeacon?.(endpoint.toString())) return;
-
   fetch(endpoint, {
     method: "POST",
     mode: "cors",
     cache: "no-store",
     keepalive: true,
-  }).catch(() => {});
+  })
+    .then(async (response) => {
+      if (!response.ok) return;
+      const result = await response.json();
+      const clicks = Number(result.clicks);
+      const heat = Number(result.heat);
+      if (Number.isFinite(clicks)) {
+        state.clickCounts.set(counterId, clicks);
+        updateClickCount(counterId, clicks);
+      }
+      if (Number.isFinite(heat)) {
+        state.heatCounts.set(counterId, heat);
+        updateHeat(counterId, heat);
+      }
+    })
+    .catch(() => {});
 }
 
 function updateHealthBadge(badge, status) {
@@ -691,10 +727,13 @@ function renderSiteCard(site) {
   if (knownHealth) updateHealthBadge(node.querySelector(".site-health"), knownHealth);
 
   const clickCount = node.querySelector(".site-click-count");
+  const heat = node.querySelector(".site-heat");
   if (config.counterId) {
     clickCount.dataset.counterId = config.counterId;
+    heat.dataset.heatCounterId = config.counterId;
   } else {
     clickCount.hidden = true;
+    heat.hidden = true;
   }
 
   const description = node.querySelector(".site-description");
