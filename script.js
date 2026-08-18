@@ -558,6 +558,31 @@ function updateHeat(counterId, value, stateName = "ready") {
   });
 }
 
+function reorderSiteCardsByHeat() {
+  const sortedSites = [...state.sites].sort((a, b) => {
+    const aCounterId = a.card.counterId;
+    const bCounterId = b.card.counterId;
+    const hasAHeat = Boolean(aCounterId) && state.heatCounts.has(aCounterId);
+    const hasBHeat = Boolean(bCounterId) && state.heatCounts.has(bCounterId);
+
+    if (hasAHeat && hasBHeat) {
+      return state.heatCounts.get(aCounterId) - state.heatCounts.get(bCounterId)
+        || a.order - b.order;
+    }
+    if (hasAHeat !== hasBHeat) return hasAHeat ? -1 : 1;
+    return a.order - b.order;
+  });
+
+  const cardsBySiteId = new Map(
+    [...elements.grid.children].map((card) => [card.dataset.siteId, card]),
+  );
+
+  sortedSites.forEach((site) => {
+    const card = cardsBySiteId.get(String(site.order));
+    if (card) elements.grid.append(card);
+  });
+}
+
 async function loadClickCounts(sites) {
   const counterIds = sites.map((site) => site.card.counterId).filter(Boolean);
   if (!clickCounterApi || !counterIds.length) return;
@@ -576,6 +601,7 @@ async function loadClickCounts(sites) {
       updateClickCount(counterId, clicks);
       updateHeat(counterId, heatValue);
     });
+    reorderSiteCardsByHeat();
   } catch {
     counterIds.forEach((counterId) => {
       updateClickCount(counterId, 0, "unavailable");
@@ -612,6 +638,7 @@ function trackSiteClick(counterId) {
       if (Number.isFinite(heat)) {
         state.heatCounts.set(counterId, heat);
         updateHeat(counterId, heat);
+        reorderSiteCardsByHeat();
       }
     })
     .catch(() => {});
