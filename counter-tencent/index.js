@@ -12,6 +12,10 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:4173",
   "http://127.0.0.1:4173",
 ]);
+const GATEWAY_CORS_ORIGINS = new Set([
+  "http://localhost:4173",
+  "http://127.0.0.1:4173",
+]);
 
 const envId = process.env.TCB_ENV_ID || process.env.ENV_ID;
 const cloudbaseApiKey = process.env.CLOUDBASE_APIKEY;
@@ -34,6 +38,16 @@ function firstDocument(result) {
 function isMissingDocument(error) {
   const value = `${error?.code || ""} ${error?.message || error || ""}`;
   return /not.?found|not.?exist|collection.?not.?exist|不存在|找不到/i.test(value);
+}
+
+function headersFor(origin) {
+  if (!ALLOWED_ORIGINS.has(origin) || GATEWAY_CORS_ORIGINS.has(origin)) return {};
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    Vary: "Origin",
+  };
 }
 
 async function ensureDocument(document, initialData) {
@@ -181,7 +195,7 @@ async function isRateLimited(siteId, visitor, ipAddress) {
 async function main(event) {
   const request = eventRequest(event);
   const origin = request.headers.origin || "";
-  const cors = {};
+  const cors = headersFor(origin);
 
   if (request.method === "OPTIONS") {
     return origin && ALLOWED_ORIGINS.has(origin)
