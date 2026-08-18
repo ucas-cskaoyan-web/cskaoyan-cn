@@ -47,7 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260817-click-counter-1" />
+    <link rel="stylesheet" href="styles.css?v=20260818-heat-only-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -170,7 +170,7 @@
 
         <div class="site-grid" id="site-grid" hidden></div>
         <p class="click-count-note">
-          <span>访问量数据经过简单的防刷验证，不确保其完全准确。</span>
+          <span hidden>访问量数据经过简单的防刷验证，不确保其完全准确。</span>
           <span>热度基于 IP 统计，在一定程度上可以认为是访问人数。</span>
         </p>
 
@@ -325,7 +325,7 @@
               <span class="health-dot" aria-hidden="true"></span>
               <span class="health-label">检测中</span>
             </span>
-            <span class="site-click-count is-loading" aria-live="polite" title="正在读取卡片点击量">
+            <span class="site-click-count is-loading" aria-live="polite" title="正在读取卡片点击量" hidden>
               读取点击量
             </span>
             <span class="site-heat is-loading" aria-live="polite" title="正在读取站点热度">

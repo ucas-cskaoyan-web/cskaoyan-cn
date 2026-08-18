@@ -587,7 +587,7 @@ svg {
   display: block;
 }
 
-.click-count-note span + span {
+.click-count-note span:not([hidden]) + span:not([hidden]) {
   margin-top: 2px;
 }
 
@@ -1595,7 +1595,7 @@ svg {
 }
 
 .site-heat {
-  top: calc(100% + 32px);
+  top: calc(100% + 6px);
   background: rgba(255, 251, 254, 0.64);
   font-weight: 500;
 }
