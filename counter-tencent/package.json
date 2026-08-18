@@ -1,0 +1,8 @@
+{
+  "name": "cskaoyan-tencent-counter",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.3"
+  }
+}

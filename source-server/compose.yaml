@@ -1,0 +1,22 @@
+services:
+  source-service:
+    build: .
+    container_name: cskaoyan-source
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9100:8080"
+    environment:
+      COUNTER_SECRET: ${COUNTER_SECRET:?COUNTER_SECRET is required}
+      DATABASE_PATH: /data/counter.db
+      IMAGE_DIR: /app/images
+      ALLOWED_ORIGINS: https://cskaoyan.cn,https://www.cskaoyan.cn,https://ucas-cskaoyan-web.github.io,http://localhost:4173,http://127.0.0.1:4173
+    volumes:
+      - ./data:/data
+      - ./images:/app/images:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

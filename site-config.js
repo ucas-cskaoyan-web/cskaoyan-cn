@@ -5,9 +5,11 @@
  * 新增院校时只需要在 profiles 中增加一个同名配置，未配置的院校会使用
  * defaults，不会影响其他卡片。
  */
+const sourceImage = (fileName) => `https://source.cskaoyan.cn/img/${fileName}`;
+
 export const siteCardConfig = {
   clickCounter: {
-    apiBaseUrl: "https://cskaoyan-card-clicks.ucas-cskaoyan-web.workers.dev",
+    apiBaseUrl: "https://cskaoyan-cn-d5g3iz6sp2d1860a5-1310904868.ap-shanghai.app.tcloudbase.com/counter",
   },
 
   defaults: {
@@ -26,6 +28,7 @@ export const siteCardConfig = {
       variant: "institute-featured",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzHXQ.jpg",
+        serverSrc: sourceImage("iie-cover.jpg"),
         fallbackSrc: "images/iie-cover.jpg",
         position: "center 12%",
       },
@@ -54,6 +57,7 @@ export const siteCardConfig = {
       variant: "cover",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzxhV.jpg",
+        serverSrc: sourceImage("iscas-cover.jpg"),
         fallbackSrc: "images/iscas-cover.jpg",
         position: "center 10%",
       },
@@ -69,6 +73,7 @@ export const siteCardConfig = {
       variant: "title-only",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzO7n.jpg",
+        serverSrc: sourceImage("sict-cover.jpg"),
         fallbackSrc: "images/sict-cover.jpg",
         position: "center",
       },
@@ -88,6 +93,7 @@ export const siteCardConfig = {
       scoreFile: "scores/bgi.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzqmj.jpg",
+        serverSrc: sourceImage("bgi-cover.jpg"),
         fallbackSrc: "images/bgi-cover.jpg",
         position: "center",
       },
@@ -102,6 +108,7 @@ export const siteCardConfig = {
       scoreFile: "scores/hias.md",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzjkq.png",
+        serverSrc: sourceImage("hias-cover.png"),
         fallbackSrc: "images/hias-cover.png",
       },
       theme: {
@@ -116,6 +123,7 @@ export const siteCardConfig = {
       variant: "cover",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzL0s.jpg",
+        serverSrc: sourceImage("cnic-cover.jpg"),
         fallbackSrc: "images/cnic-cover.jpg",
         position: "center",
       },
@@ -131,6 +139,7 @@ export const siteCardConfig = {
       variant: "ict-watercolor",
       image: {
         src: "https://s41.ax1x.com/2026/08/16/pmXzvt0.png",
+        serverSrc: sourceImage("ict-cover.png"),
         fallbackSrc: "images/ict-cover.png",
         position: "center",
       },

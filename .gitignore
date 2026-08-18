@@ -1,1 +1,13 @@
 .wrangler/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+source-server/.env
+source-server/data/
+source-server/images/
+source-server/__pycache__/
+counter-tencent/node_modules/

@@ -1,4 +1,4 @@
-import { siteCardConfig } from "./site-config.js?v=20260817-image-fallback-1";
+import { siteCardConfig } from "./site-config.js?v=20260818-image-fallback-3";
 
 const state = {
   sites: [],
@@ -63,39 +63,63 @@ function cardCoverUrl(value) {
   return `url("${escaped}")`;
 }
 
+function getCardImageSources(image) {
+  return [
+    { url: image?.src, name: "image-host" },
+    { url: image?.serverSrc, name: "aliyun-server" },
+    { url: image?.fallbackSrc, name: "github-pages" },
+  ].filter((source, index, sources) => {
+    return source.url && sources.findIndex((candidate) => candidate.url === source.url) === index;
+  });
+}
+
 function applyCardCover(card, image) {
-  const primarySrc = image?.src;
-  if (!primarySrc) return;
+  const sources = getCardImageSources(image);
+  if (!sources.length) return;
 
   card.classList.add("site-card--cover");
-  card.style.setProperty("--card-cover", cardCoverUrl(primarySrc));
   card.style.setProperty("--card-cover-position", image.position || "center");
-  card.dataset.coverSource = "primary";
 
-  const fallbackSrc = image.fallbackSrc;
-  if (!fallbackSrc || fallbackSrc === primarySrc) return;
-
-  const probe = new Image();
+  let sourceIndex = 0;
   let settled = false;
-  const useFallback = () => {
-    if (settled) return;
-    settled = true;
-    window.clearTimeout(timeout);
-    cardCoverProbes.delete(card);
-    card.style.setProperty("--card-cover", cardCoverUrl(fallbackSrc));
-    card.dataset.coverSource = "fallback";
-  };
-  const timeout = window.setTimeout(useFallback, cardCoverTimeoutMs);
+  let timeout;
+  let probe;
+  let attempt = 0;
 
-  probe.addEventListener("load", () => {
+  const tryNextSource = () => {
     if (settled) return;
-    settled = true;
     window.clearTimeout(timeout);
-    cardCoverProbes.delete(card);
-  }, { once: true });
-  probe.addEventListener("error", useFallback, { once: true });
-  cardCoverProbes.set(card, probe);
-  probe.src = primarySrc;
+    if (sourceIndex >= sources.length) {
+      settled = true;
+      cardCoverProbes.delete(card);
+      return;
+    }
+
+    const source = sources[sourceIndex];
+    sourceIndex += 1;
+    const currentAttempt = ++attempt;
+    card.style.setProperty("--card-cover", cardCoverUrl(source.url));
+    card.dataset.coverSource = source.name;
+
+    const currentProbe = new Image();
+    probe = currentProbe;
+    const advance = () => {
+      if (settled || currentAttempt !== attempt) return;
+      tryNextSource();
+    };
+    timeout = window.setTimeout(advance, cardCoverTimeoutMs);
+    currentProbe.addEventListener("load", () => {
+      if (settled || currentAttempt !== attempt) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      cardCoverProbes.delete(card);
+    }, { once: true });
+    currentProbe.addEventListener("error", advance, { once: true });
+    cardCoverProbes.set(card, currentProbe);
+    currentProbe.src = source.url;
+  };
+
+  tryNextSource();
 }
 
 function normalizeMarkdownLink(line) {
