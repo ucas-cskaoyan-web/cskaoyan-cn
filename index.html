@@ -47,7 +47,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260818-heat-only-1" />
+    <link rel="stylesheet" href="styles.css?v=20260819-score-plans-1" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -74,7 +74,7 @@
         ]
       }
     </script>
-    <script type="module" src="script.js?v=20260818-heat-sort-1"></script>
+    <script type="module" src="script.js?v=20260819-score-plans-3"></script>
   </head>
   <body>
     <a class="skip-link" href="#sites">跳到站点列表</a>
@@ -182,53 +182,68 @@
             </div>
             <span class="score-year-range" id="score-year-range">近三年</span>
           </div>
+          <p class="score-legend">- 表示不限制、？表示数据缺失</p>
 
-          <div class="score-toolbar" aria-label="分数线筛选">
-            <label>
-              <span>研究所</span>
-              <select id="score-institution-filter">
-                <option value="">全部院所</option>
-              </select>
-            </label>
-            <label>
-              <span>年份</span>
-              <select id="score-year-filter">
-                <option value="">全部年份</option>
-              </select>
-            </label>
-            <label>
-              <span>专业课代码</span>
-              <select id="score-course-filter">
-                <option value="">全部代码</option>
-              </select>
-            </label>
-            <label>
-              <span>类型</span>
-              <select id="score-degree-filter">
-                <option value="">全部类型</option>
-              </select>
-            </label>
-          </div>
+          <div class="score-plans">
+            <section class="score-plan" data-score-plan="normal" aria-labelledby="normal-plan-title">
+              <div class="score-plan-heading">
+                <span class="score-plan-index">01</span>
+                <h3 id="normal-plan-title">普通计划</h3>
+              </div>
+              <div class="score-toolbar" aria-label="普通计划分数线筛选">
+                <label><span>研究所</span><select data-score-filter="institution"><option value="">全部院所</option></select></label>
+                <label><span>年份</span><select data-score-filter="year"><option value="">全部年份</option></select></label>
+                <label><span>专业课代码</span><select data-score-filter="course"><option value="">全部代码</option></select></label>
+                <label><span>类型</span><select data-score-filter="degree"><option value="">全部类型</option></select></label>
+              </div>
+              <p class="score-status" data-score-status>正在读取分数线数据…</p>
+              <div class="score-table-wrap">
+                <table class="score-table" data-score-table hidden>
+                  <thead><tr><th scope="col">研究所</th><th scope="col">年份</th><th scope="col">类型</th><th scope="col">专业</th><th scope="col">专业课代码</th><th scope="col">政治</th><th scope="col">英语</th><th scope="col">数学</th><th scope="col">专业课</th><th scope="col">总分线</th></tr></thead>
+                  <tbody data-score-table-body></tbody>
+                </table>
+              </div>
+            </section>
 
-          <p class="score-status" id="score-status">正在读取分数线数据…</p>
-          <div class="score-table-wrap">
-            <table class="score-table" id="score-table" hidden>
-              <thead>
-                <tr>
-                  <th scope="col">研究所</th>
-                  <th scope="col">年份</th>
-                  <th scope="col">类型</th>
-                  <th scope="col">专业</th>
-                  <th scope="col">专业课代码</th>
-                  <th scope="col">政治</th>
-                  <th scope="col">英语</th>
-                  <th scope="col">数学</th>
-                  <th scope="col">专业课</th>
-                  <th scope="col">总分线</th>
-                </tr>
-              </thead>
-              <tbody id="score-table-body"></tbody>
-            </table>
+            <section class="score-plan" data-score-plan="soldier" aria-labelledby="soldier-plan-title">
+              <div class="score-plan-heading">
+                <span class="score-plan-index">02</span>
+                <h3 id="soldier-plan-title">退役大学生士兵计划</h3>
+              </div>
+              <div class="score-toolbar" aria-label="退役大学生士兵计划分数线筛选">
+                <label><span>研究所</span><select data-score-filter="institution"><option value="">全部院所</option></select></label>
+                <label><span>年份</span><select data-score-filter="year"><option value="">全部年份</option></select></label>
+                <label><span>专业课代码</span><select data-score-filter="course"><option value="">全部代码</option></select></label>
+                <label><span>类型</span><select data-score-filter="degree"><option value="">全部类型</option></select></label>
+              </div>
+              <p class="score-status" data-score-status>正在读取分数线数据…</p>
+              <div class="score-table-wrap">
+                <table class="score-table" data-score-table hidden>
+                  <thead><tr><th scope="col">研究所</th><th scope="col">年份</th><th scope="col">类型</th><th scope="col">专业</th><th scope="col">专业课代码</th><th scope="col">政治</th><th scope="col">英语</th><th scope="col">数学</th><th scope="col">专业课</th><th scope="col">总分线</th></tr></thead>
+                  <tbody data-score-table-body></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="score-plan" data-score-plan="minority" aria-labelledby="minority-plan-title">
+              <div class="score-plan-heading">
+                <span class="score-plan-index">03</span>
+                <h3 id="minority-plan-title">少数民族高层次骨干人才计划</h3>
+              </div>
+              <div class="score-toolbar" aria-label="少数民族高层次骨干人才计划分数线筛选">
+                <label><span>研究所</span><select data-score-filter="institution"><option value="">全部院所</option></select></label>
+                <label><span>年份</span><select data-score-filter="year"><option value="">全部年份</option></select></label>
+                <label><span>专业课代码</span><select data-score-filter="course"><option value="">全部代码</option></select></label>
+                <label><span>类型</span><select data-score-filter="degree"><option value="">全部类型</option></select></label>
+              </div>
+              <p class="score-status" data-score-status>正在读取分数线数据…</p>
+              <div class="score-table-wrap">
+                <table class="score-table" data-score-table hidden>
+                  <thead><tr><th scope="col">研究所</th><th scope="col">年份</th><th scope="col">类型</th><th scope="col">专业</th><th scope="col">专业课代码</th><th scope="col">政治</th><th scope="col">英语</th><th scope="col">数学</th><th scope="col">专业课</th><th scope="col">总分线</th></tr></thead>
+                  <tbody data-score-table-body></tbody>
+                </table>
+              </div>
+            </section>
           </div>
         </section>
 

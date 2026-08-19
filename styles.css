@@ -611,6 +611,13 @@ svg {
   line-height: 1.2;
 }
 
+.score-legend {
+  margin: 12px 0 0;
+  color: var(--md-on-surface-variant);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 .score-year-range {
   padding: 8px 14px;
   border-radius: 999px;
@@ -618,6 +625,37 @@ svg {
   color: var(--md-on-secondary-container);
   font-size: 0.84rem;
   white-space: nowrap;
+}
+
+.score-plans {
+  margin-top: 34px;
+}
+
+.score-plan + .score-plan {
+  margin-top: 48px;
+  padding-top: 42px;
+  border-top: 1px solid var(--md-outline-variant);
+}
+
+.score-plan-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.score-plan-heading h3 {
+  margin: 0;
+  color: var(--md-on-surface);
+  font-size: 1.14rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.score-plan-index {
+  color: var(--md-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
 }
 
 .score-toolbar {
@@ -655,6 +693,10 @@ svg {
   border: 1px solid var(--md-outline-variant);
   border-radius: 16px;
   background: var(--md-surface-container-lowest);
+}
+
+.score-table-wrap:has(.score-table[hidden]) {
+  display: none;
 }
 
 .score-table {
@@ -1997,6 +2039,15 @@ svg {
   .score-toolbar {
     display: grid;
     grid-template-columns: 1fr 1fr;
+  }
+
+  .score-plans {
+    margin-top: 28px;
+  }
+
+  .score-plan + .score-plan {
+    margin-top: 38px;
+    padding-top: 34px;
   }
 
   .score-toolbar label {

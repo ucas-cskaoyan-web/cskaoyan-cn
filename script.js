@@ -6,21 +6,28 @@ const state = {
   clickCounts: new Map(),
   heatCounts: new Map(),
   lastClickAt: new Map(),
-  scoreRows: [],
+  scoreRows: new Map(),
 };
 
 const elements = {
   grid: document.querySelector("#site-grid"),
   template: document.querySelector("#site-card-template"),
-  scoreSection: document.querySelector("#score-overview"),
-  scoreStatus: document.querySelector("#score-status"),
-  scoreTable: document.querySelector("#score-table"),
-  scoreTableBody: document.querySelector("#score-table-body"),
-  scoreInstitutionFilter: document.querySelector("#score-institution-filter"),
-  scoreYearFilter: document.querySelector("#score-year-filter"),
-  scoreCourseFilter: document.querySelector("#score-course-filter"),
-  scoreDegreeFilter: document.querySelector("#score-degree-filter"),
   scoreYearRange: document.querySelector("#score-year-range"),
+  scorePlans: new Map(
+    [...document.querySelectorAll("[data-score-plan]")].map((section) => [
+      section.dataset.scorePlan,
+      {
+        section,
+        status: section.querySelector("[data-score-status]"),
+        table: section.querySelector("[data-score-table]"),
+        tableBody: section.querySelector("[data-score-table-body]"),
+        institutionFilter: section.querySelector('[data-score-filter="institution"]'),
+        yearFilter: section.querySelector('[data-score-filter="year"]'),
+        courseFilter: section.querySelector('[data-score-filter="course"]'),
+        degreeFilter: section.querySelector('[data-score-filter="degree"]'),
+      },
+    ]),
+  ),
   status: document.querySelector("#status-panel"),
   visibleCount: document.querySelector("#visible-count"),
   contact: document.querySelector("#contact-button"),
@@ -32,6 +39,11 @@ const elements = {
 };
 
 const configuredCards = siteCardConfig ?? {};
+const scorePlanDefinitions = [
+  { id: "normal", headings: ["普通计划"] },
+  { id: "soldier", headings: ["退役大学生士兵计划", "士兵计划"] },
+  { id: "minority", headings: ["少数民族高层次骨干人才计划", "少数民族骨干计划", "少干计划"] },
+];
 const clickCounterApi = configuredCards.clickCounter?.apiBaseUrl?.replace(/\/$/, "") || "";
 const clickVisitorId = getClickVisitorId();
 
@@ -235,9 +247,7 @@ function resolveCardConfig(site) {
 }
 
 function resolveScoreFile(site) {
-  const configuredFile = site.card?.scoreFile;
-  if (configuredFile) return configuredFile;
-  return `scores/${encodeURIComponent(site.shortName)}.md`;
+  return site.card?.scoreFile || `scores/${encodeURIComponent(site.shortName)}.md`;
 }
 
 function normalizeScoreHeader(value) {
@@ -252,8 +262,34 @@ function parseScoreCell(value) {
   };
 }
 
-function parseScoreMarkdown(markdown, site) {
+function extractScorePlanMarkdown(markdown, planId) {
   const lines = markdown.replace(/\r\n?/g, "\n").split("\n");
+  const headings = [];
+
+  lines.forEach((line, index) => {
+    const match = line.trim().match(/^##(?!#)\s+(.+?)\s*$/);
+    if (!match) return;
+
+    const heading = inlineText(match[1]).replace(/\s+/g, "");
+    const plan = scorePlanDefinitions.find((candidate) => {
+      return candidate.headings.some((name) => name.replace(/\s+/g, "") === heading);
+    });
+    if (plan) headings.push({ index, planId: plan.id });
+  });
+
+  // 兼容旧文件：没有计划标题时，第一张表仍按普通计划处理。
+  if (!headings.length) return planId === "normal" ? markdown : "";
+
+  const targetIndex = headings.findIndex((heading) => heading.planId === planId);
+  if (targetIndex < 0) return "";
+
+  const start = headings[targetIndex].index + 1;
+  const end = headings[targetIndex + 1]?.index ?? lines.length;
+  return lines.slice(start, end).join("\n");
+}
+
+function parseScoreMarkdown(markdown, site, planId) {
+  const lines = extractScorePlanMarkdown(markdown, planId).split("\n");
   const rows = [];
 
   for (let index = 0; index < lines.length - 1; index += 1) {
@@ -325,7 +361,7 @@ function getRecentScoreRows(rows) {
     .sort((a, b) => b.year - a.year || a.institutionName.localeCompare(b.institutionName, "zh-CN"));
 }
 
-function updateScoreFilters(rows) {
+function updateScoreFilters(rows, view) {
   const institutions = [...new Set(rows.map((row) => row.institutionName))];
   const years = [...new Set(rows.map((row) => row.year))].sort((a, b) => b - a);
   const courseCodes = [...new Set(rows.map((row) => row.professionalCourseCode))]
@@ -338,25 +374,28 @@ function updateScoreFilters(rows) {
     if (normalizedValues.includes(previous)) select.value = previous;
   };
 
-  updateSelect(elements.scoreInstitutionFilter, institutions, "全部院所");
-  updateSelect(elements.scoreYearFilter, years, "全部年份");
-  updateSelect(elements.scoreCourseFilter, courseCodes, "全部代码");
-  updateSelect(elements.scoreDegreeFilter, degrees, "全部类型");
+  updateSelect(view.institutionFilter, institutions, "全部院所");
+  updateSelect(view.yearFilter, years, "全部年份");
+  updateSelect(view.courseFilter, courseCodes, "全部代码");
+  updateSelect(view.degreeFilter, degrees, "全部类型");
 }
 
-function renderScoreRows() {
-  const institution = elements.scoreInstitutionFilter.value;
-  const year = elements.scoreYearFilter.value;
-  const courseCode = elements.scoreCourseFilter.value;
-  const degree = elements.scoreDegreeFilter.value;
-  const rows = state.scoreRows.filter((row) => {
+function renderScoreRows(planId) {
+  const view = elements.scorePlans.get(planId);
+  if (!view) return;
+
+  const institution = view.institutionFilter.value;
+  const year = view.yearFilter.value;
+  const courseCode = view.courseFilter.value;
+  const degree = view.degreeFilter.value;
+  const rows = (state.scoreRows.get(planId) || []).filter((row) => {
     return (!institution || row.institutionName === institution)
       && (!year || String(row.year) === year)
       && (!courseCode || row.professionalCourseCode === courseCode)
       && (!degree || row.degreeType === degree);
   });
 
-  elements.scoreTableBody.replaceChildren();
+  view.tableBody.replaceChildren();
   rows.forEach((row) => {
     const tr = document.createElement("tr");
     const values = [
@@ -386,31 +425,39 @@ function renderScoreRows() {
       source.className = "score-source";
       tr.lastElementChild.append(document.createTextNode(" "), source);
     }
-    elements.scoreTableBody.append(tr);
+    view.tableBody.append(tr);
   });
 
-  elements.scoreTable.hidden = rows.length === 0;
-  elements.scoreStatus.hidden = rows.length > 0;
-  if (!rows.length) elements.scoreStatus.textContent = "近三年暂无已录入的分数线数据";
+  view.table.hidden = rows.length === 0;
+  view.status.hidden = rows.length > 0;
+  if (!rows.length) view.status.textContent = "近三年暂无已录入的分数线数据";
 }
 
 async function loadScoreOverview(sites) {
   const currentYear = new Date().getFullYear();
   elements.scoreYearRange.textContent = `${currentYear - 2}–${currentYear} 年`;
 
-  const scoreSets = await Promise.all(sites.map(async (site) => {
+  const scoreDocuments = await Promise.all(sites.map(async (site) => {
     try {
       const response = await fetch(resolveScoreFile(site), { cache: "no-cache" });
-      if (!response.ok) return [];
-      return parseScoreMarkdown(await response.text(), site);
+      if (!response.ok) return null;
+      return { site, markdown: await response.text() };
     } catch {
-      return [];
+      return null;
     }
   }));
 
-  state.scoreRows = getRecentScoreRows(scoreSets.flat());
-  updateScoreFilters(state.scoreRows);
-  renderScoreRows();
+  scorePlanDefinitions.forEach((plan) => {
+    const rows = getRecentScoreRows(scoreDocuments.flatMap((document) => {
+      return document ? parseScoreMarkdown(document.markdown, document.site, plan.id) : [];
+    }));
+    const view = elements.scorePlans.get(plan.id);
+    state.scoreRows.set(plan.id, rows);
+    if (view) {
+      updateScoreFilters(rows, view);
+      renderScoreRows(plan.id);
+    }
+  });
 }
 
 function legacyImagePosition(alt) {
@@ -834,10 +881,11 @@ elements.contactDialog.addEventListener("click", (event) => {
   if (event.target === elements.contactDialog) elements.contactDialog.close();
 });
 
-elements.scoreInstitutionFilter.addEventListener("change", renderScoreRows);
-elements.scoreYearFilter.addEventListener("change", renderScoreRows);
-elements.scoreCourseFilter.addEventListener("change", renderScoreRows);
-elements.scoreDegreeFilter.addEventListener("change", renderScoreRows);
+elements.scorePlans.forEach((view, planId) => {
+  [view.institutionFilter, view.yearFilter, view.courseFilter, view.degreeFilter].forEach((filter) => {
+    filter.addEventListener("change", () => renderScoreRows(planId));
+  });
+});
 
 elements.copyEmail.addEventListener("click", async () => {
   const email = elements.copyEmail.dataset.email;
