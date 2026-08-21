@@ -164,9 +164,13 @@ export const siteCardConfig = {
     },
 
     重庆所: {
+      counterId: "cigit",
+      scoreFile: "scores/cigit.md",
       variant: "cigit-featured",
       image: {
-        src: "images/cigit-cover.png",
+        src: "https://s41.ax1x.com/2026/08/21/pmz9Dx0.png",
+        serverSrc: sourceImage("cigit-cover.png"),
+        fallbackSrc: "images/cigit-cover.png",
         position: "center 42%",
       },
       theme: {

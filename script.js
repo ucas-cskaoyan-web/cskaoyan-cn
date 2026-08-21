@@ -1,4 +1,4 @@
-import { siteCardConfig } from "./site-config.js?v=20260818-image-fallback-3";
+import { siteCardConfig } from "./site-config.js?v=20260821-cigit-image-1";
 
 const state = {
   sites: [],
