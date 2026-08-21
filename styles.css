@@ -1436,6 +1436,90 @@ svg {
   height: 16px;
 }
 
+/* 重庆所：以研究院大楼为背景，突出“重庆所”作为卡片主标题。 */
+.site-card--cigit-featured {
+  border: 0;
+  background-color: #123c54;
+  background-position: var(--card-cover-position, center);
+  background-repeat: no-repeat;
+  box-shadow: 0 14px 34px rgba(12, 47, 67, 0.22);
+}
+
+.site-card--cigit-featured::before {
+  background:
+    linear-gradient(180deg, rgba(6, 29, 46, 0.18) 0%, rgba(5, 28, 45, 0.18) 30%, rgba(4, 20, 33, 0.92) 100%),
+    linear-gradient(90deg, rgba(5, 31, 48, 0.54), rgba(5, 31, 48, 0.06) 74%);
+}
+
+.site-card--cigit-featured:hover {
+  background-color: #123c54;
+  background-image: var(--card-cover);
+  background-position: var(--card-cover-position, center);
+  background-size: cover;
+  box-shadow: 0 22px 48px rgba(12, 47, 67, 0.32);
+}
+
+.site-card--cigit-featured .site-monogram {
+  min-width: 0;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(221, 246, 255, 0.58);
+  border-radius: 999px;
+  color: #e7f8ff;
+  background: rgba(5, 52, 78, 0.4);
+  box-shadow: none;
+  font-size: 0.68rem;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+}
+
+.site-card--cigit-featured .site-health {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(5, 27, 42, 0.32);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  transform: none;
+}
+
+.site-card--cigit-featured .site-health.is-online { color: #bbf0c2; }
+.site-card--cigit-featured .site-health.is-offline { color: #ffb4ab; }
+
+.site-card--cigit-featured .institute-identity {
+  position: absolute;
+  top: 75px;
+  left: 28px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(213, 243, 255, 0.88);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.42);
+}
+
+.site-card--cigit-featured .institute-identity-rule {
+  width: 25px;
+  height: 1px;
+  background: linear-gradient(90deg, #86dcff, rgba(134, 220, 255, 0.18));
+}
+
+.site-card--cigit-featured .institute-identity-copy { display: grid; gap: 2px; }
+.site-card--cigit-featured .institute-identity-copy strong { font: 700 0.58rem/1.2 Georgia, "Times New Roman", serif; letter-spacing: 0.14em; }
+.site-card--cigit-featured .institute-identity-copy small { color: rgba(235, 249, 255, 0.66); font-size: 0.58rem; line-height: 1.2; letter-spacing: 0.06em; }
+
+.site-card--cigit-featured .site-content { margin-top: auto; padding-top: 57px; }
+.site-card--cigit-featured .site-content h3 { display: flex; margin-bottom: 10px; flex-direction: column; align-items: flex-start; color: white; line-height: 1; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.46); }
+.site-card--cigit-featured .cigit-title-academy { color: #bfeaff; font: 700 0.68rem/1.25 "Songti SC", "Noto Serif CJK SC", STSong, serif; letter-spacing: 0.14em; }
+.site-card--cigit-featured .cigit-title-city { margin-top: 5px; color: #ffffff; font-size: clamp(2.18rem, 3.4vw, 2.78rem); font-weight: 800; line-height: 0.98; letter-spacing: 0.08em; }
+.site-card--cigit-featured .cigit-title-name { margin-top: 8px; color: #d3f2ff; font: 700 0.82rem/1.2 "Songti SC", "Noto Serif CJK SC", STSong, serif; letter-spacing: 0.12em; }
+.site-card--cigit-featured .cigit-title-english { max-width: 230px; margin-top: 8px; color: rgba(255, 255, 255, 0.7); font: 600 0.48rem/1.35 Georgia, "Times New Roman", serif; letter-spacing: 0.07em; }
+.site-card--cigit-featured .site-description { color: rgba(255, 255, 255, 0.84); font-size: 0.8rem; line-height: 1.58; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.42); -webkit-line-clamp: 2; }
+.site-card--cigit-featured .site-link { min-height: 36px; margin: 13px 0 0; padding: 0 13px; align-self: flex-end; border: 1px solid rgba(206, 244, 255, 0.58); color: #effcff; background: rgba(4, 40, 62, 0.42); box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16); backdrop-filter: blur(10px); }
+.site-card--cigit-featured .site-link:hover { color: white; background: rgba(126, 218, 255, 0.25); text-decoration: none; }
+.site-card--cigit-featured .site-link svg { width: 15px; height: 15px; }
+
 .card-topline {
   position: relative;
   z-index: 1;

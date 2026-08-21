@@ -162,5 +162,32 @@ export const siteCardConfig = {
       ],
       linkLabel: "进入专题",
     },
+
+    重庆所: {
+      variant: "cigit-featured",
+      image: {
+        src: "images/cigit-cover.png",
+        position: "center 42%",
+      },
+      theme: {
+        color: "#075e8c",
+        aura: "#bce8f7",
+      },
+      monogram: "重庆所",
+      identity: {
+        code: "CAS · CIGIT",
+        subtitle: "院所专题 · 2026",
+      },
+      titleParts: [
+        { className: "cigit-title-academy", text: "中国科学院" },
+        { className: "cigit-title-city", text: "重庆所" },
+        { className: "cigit-title-name", text: "绿色智能技术研究院" },
+        {
+          className: "cigit-title-english",
+          text: "CHONGQING INSTITUTE OF GREEN & INTELLIGENT TECHNOLOGY",
+        },
+      ],
+      linkLabel: "进入专题",
+    },
   },
 };
