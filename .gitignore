@@ -10,4 +10,6 @@ source-server/.env
 source-server/data/
 source-server/images/
 source-server/__pycache__/
+counter-server/
+migration/
 artifacts/

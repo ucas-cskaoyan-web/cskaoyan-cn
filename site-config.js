@@ -9,7 +9,7 @@ const sourceImage = (fileName) => `https://source.cskaoyan.cn/img/${fileName}`;
 
 export const siteCardConfig = {
   clickCounter: {
-    apiBaseUrl: "https://cskaoyan-cn-d5g3iz6sp2d1860a5-1310904868.ap-shanghai.app.tcloudbase.com/counter",
+    apiBaseUrl: "https://source.cskaoyan.cn/counter",
   },
 
   defaults: {
