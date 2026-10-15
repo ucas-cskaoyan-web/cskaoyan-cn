@@ -234,11 +234,6 @@ svg {
   box-shadow: 0 9px 24px rgba(103, 80, 164, 0.28);
 }
 
-.qq-groups-button {
-  background: var(--md-secondary-container);
-  color: var(--md-on-secondary-container);
-}
-
 :focus-visible {
   outline: 2px solid var(--md-primary);
   outline-offset: 3px;
@@ -1964,40 +1959,6 @@ svg {
   gap: 12px;
   border-radius: 20px;
   background: var(--md-surface-container-high);
-}
-
-.qq-group-list {
-  display: grid;
-  gap: 10px;
-}
-
-.qq-group-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 14px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid var(--md-outline-variant);
-  border-radius: 14px;
-  background: var(--md-surface-container);
-  color: var(--md-on-surface);
-  text-align: left;
-  cursor: pointer;
-}
-
-.qq-group-item:hover {
-  border-color: var(--md-primary);
-  background: var(--md-secondary-container);
-}
-
-.qq-group-item strong {
-  color: var(--md-primary);
-  letter-spacing: 0.04em;
-}
-
-.qq-copy-status {
-  color: var(--md-on-surface-variant);
-  font-size: 0.82rem;
 }
 
 .email-field > span {

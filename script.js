@@ -34,9 +34,6 @@ const elements = {
   contactDialog: document.querySelector("#contact-dialog"),
   dialogClose: document.querySelector("#dialog-close"),
   copyEmail: document.querySelector("#copy-email"),
-  qqGroups: document.querySelector("#qq-groups-button"),
-  qqDialog: document.querySelector("#qq-dialog"),
-  qqDialogClose: document.querySelector("#qq-dialog-close"),
   backToTop: document.querySelector("#back-to-top"),
   year: document.querySelector("#year"),
 };
@@ -882,33 +879,6 @@ elements.dialogClose.addEventListener("click", () => {
 
 elements.contactDialog.addEventListener("click", (event) => {
   if (event.target === elements.contactDialog) elements.contactDialog.close();
-});
-
-elements.qqGroups.addEventListener("click", () => {
-  elements.qqDialog.showModal();
-});
-
-elements.qqDialogClose.addEventListener("click", () => {
-  elements.qqDialog.close();
-});
-
-elements.qqDialog.addEventListener("click", (event) => {
-  if (event.target === elements.qqDialog) elements.qqDialog.close();
-});
-
-document.querySelectorAll(".qq-group-item").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const number = button.dataset.qqNumber;
-    const status = button.querySelector(".qq-copy-status");
-    try {
-      await navigator.clipboard.writeText(number);
-      status.textContent = "已复制";
-      window.setTimeout(() => { status.textContent = "复制"; }, 1600);
-    } catch {
-      status.textContent = "请手动复制";
-      window.setTimeout(() => { status.textContent = "复制"; }, 1800);
-    }
-  });
 });
 
 elements.scorePlans.forEach((view, planId) => {
