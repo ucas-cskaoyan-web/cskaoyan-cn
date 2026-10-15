@@ -1966,6 +1966,19 @@ svg {
   background: var(--md-surface-container-high);
 }
 
+.qq-dialog {
+  overscroll-behavior-y: contain;
+  scrollbar-width: none;
+}
+
+html:has(#qq-dialog[open]) {
+  overflow: hidden;
+}
+
+.qq-dialog::-webkit-scrollbar {
+  display: none;
+}
+
 .qq-group-list {
   display: grid;
   gap: 10px;
