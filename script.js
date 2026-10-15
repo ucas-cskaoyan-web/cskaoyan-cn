@@ -1,4 +1,4 @@
-import { siteCardConfig } from "./site-config.js?v=20260829-counter-migration-1";
+import { siteCardConfig } from "./site-config.js?v=20261015-qq-groups-2";
 
 const state = {
   sites: [],
