@@ -37,6 +37,8 @@ const elements = {
   qqGroups: document.querySelector("#qq-groups-button"),
   qqDialog: document.querySelector("#qq-dialog"),
   qqDialogClose: document.querySelector("#qq-dialog-close"),
+  qqGroupList: document.querySelector("#qq-group-list"),
+  qqGroupStatus: document.querySelector("#qq-group-status"),
   backToTop: document.querySelector("#back-to-top"),
   year: document.querySelector("#year"),
 };
@@ -886,6 +888,7 @@ elements.contactDialog.addEventListener("click", (event) => {
 
 elements.qqGroups.addEventListener("click", () => {
   elements.qqDialog.showModal();
+  loadQQGroups();
 });
 
 elements.qqDialogClose.addEventListener("click", () => {
@@ -896,19 +899,54 @@ elements.qqDialog.addEventListener("click", (event) => {
   if (event.target === elements.qqDialog) elements.qqDialog.close();
 });
 
-document.querySelectorAll(".qq-group-item").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const number = button.dataset.qqNumber;
-    const status = button.querySelector(".qq-copy-status");
-    try {
-      await navigator.clipboard.writeText(number);
-      status.textContent = "已复制";
-      window.setTimeout(() => { status.textContent = "复制"; }, 1600);
-    } catch {
-      status.textContent = "请手动复制";
-      window.setTimeout(() => { status.textContent = "复制"; }, 1800);
-    }
-  });
+async function loadQQGroups() {
+  elements.qqGroupStatus.hidden = false;
+  elements.qqGroupStatus.textContent = "正在读取群列表…";
+  elements.qqGroupList.replaceChildren();
+  try {
+    const response = await fetch("qq-groups.md", { cache: "no-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const groups = (await response.text()).split(/\r?\n/)
+      .filter((line) => line.trim().startsWith("|"))
+      .map(splitMarkdownTableRow)
+      .filter(([name, number]) => name && /^\d{5,12}$/.test(number));
+    groups.forEach(([name, number]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "qq-group-item";
+      button.dataset.qqNumber = number;
+      button.setAttribute("aria-label", `复制${name}群号 ${number}`);
+      const label = document.createElement("span");
+      label.textContent = name;
+      const value = document.createElement("strong");
+      value.textContent = number;
+      const status = document.createElement("span");
+      status.className = "qq-copy-status";
+      status.setAttribute("aria-live", "polite");
+      status.textContent = "复制";
+      button.append(label, value, status);
+      elements.qqGroupList.append(button);
+    });
+    elements.qqGroupStatus.hidden = groups.length > 0;
+    if (!groups.length) elements.qqGroupStatus.textContent = "暂无交流群";
+  } catch {
+    elements.qqGroupStatus.textContent = "群列表读取失败，请关闭弹窗后重试。";
+  }
+}
+
+elements.qqGroupList.addEventListener("click", async (event) => {
+  const button = event.target.closest(".qq-group-item");
+  if (!button) return;
+  const number = button.dataset.qqNumber;
+  const status = button.querySelector(".qq-copy-status");
+  try {
+    await navigator.clipboard.writeText(number);
+    status.textContent = "已复制";
+    window.setTimeout(() => { status.textContent = "复制"; }, 1600);
+  } catch {
+    status.textContent = "请手动复制";
+    window.setTimeout(() => { status.textContent = "复制"; }, 1800);
+  }
 });
 
 elements.scorePlans.forEach((view, planId) => {

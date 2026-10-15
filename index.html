@@ -74,7 +74,7 @@
         ]
       }
     </script>
-    <script type="module" src="script.js?v=20261015-qq-groups-2"></script>
+    <script type="module" src="script.js?v=20261015-qq-markdown-1"></script>
   </head>
   <body>
     <a class="skip-link" href="#sites">跳到站点列表</a>
@@ -354,62 +354,8 @@
       <span class="section-kicker">QQ GROUPS</span>
       <h2 id="qq-title">加入交流群</h2>
       <p class="qq-disclaimer">点击群号即可复制，以下群聊均为非官方组织，请自行甄别群内信息。</p>
-      <div class="qq-group-list">
-        <button class="qq-group-item" type="button" data-qq-number="746577276">
-          <span>计算所</span><strong>746577276</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="587081553">
-          <span>软件所</span><strong>587081553</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="1083153754">
-          <span>信工所</span><strong>1083153754</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="592994913">
-          <span>网络中心</span><strong>592994913</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="1027420558">
-          <span>沈计所</span><strong>1027420558</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="817445354">
-          <span>杭高院</span><strong>817445354</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="946372576">
-          <span>AI院华大</span><strong>946372576</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="875404078">
-          <span>新疆理化所</span><strong>875404078</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="789063230">
-          <span>成计所</span><strong>789063230</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="303540710">
-          <span>深圳先研</span><strong>303540710</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="365447309">
-          <span>小卫星</span><strong>365447309</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="827530427">
-          <span>空间中心</span><strong>827530427</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="953240758">
-          <span>空间应用</span><strong>953240758</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="813166271">
-          <span>集成院</span><strong>813166271</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="1045259052">
-          <span>自动化所</span><strong>1045259052</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="148760211">
-          <span>高能物理</span><strong>148760211</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="959915429">
-          <span>重庆绿色</span><strong>959915429</strong><span class="qq-copy-status">复制</span>
-        </button>
-        <button class="qq-group-item" type="button" data-qq-number="1007233693">
-          <span>考研闲聊群</span><strong>1007233693</strong><span class="qq-copy-status">复制</span>
-        </button>
-      </div>
+      <p id="qq-group-status" role="status" hidden></p>
+      <div class="qq-group-list" id="qq-group-list"></div>
     </dialog>
 
     <template id="site-card-template">
