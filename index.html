@@ -108,6 +108,13 @@
           </svg>
           联系我
         </button>
+        <button class="contact-button qq-groups-button" id="qq-groups-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7.3 15.8c-1.1-.9-1.8-2.2-1.8-3.8 0-3.1 2.8-5.6 6.5-5.6s6.5 2.5 6.5 5.6c0 1.6-.7 2.9-1.8 3.8.8.4 1.6 1.1 2 2.1-1.7.6-3.8.9-6.7.9s-5-.3-6.7-.9c.4-1 .9-1.7 2-2.1Z" />
+            <path d="M9 4.8c.9-.7 2-1.1 3-1.1s2.1.4 3 1.1M9.2 12h.01M14.8 12h.01" />
+          </svg>
+          QQ群
+        </button>
       </div>
     </header>
 
@@ -328,6 +335,34 @@
             <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
           </svg>
           <span>复制邮箱</span>
+        </button>
+      </div>
+    </dialog>
+
+    <dialog class="contact-dialog qq-dialog" id="qq-dialog" aria-labelledby="qq-title">
+      <button class="dialog-close" id="qq-dialog-close" type="button" aria-label="关闭弹窗" title="关闭">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg>
+      </button>
+      <div class="dialog-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7.3 15.8c-1.1-.9-1.8-2.2-1.8-3.8 0-3.1 2.8-5.6 6.5-5.6s6.5 2.5 6.5 5.6c0 1.6-.7 2.9-1.8 3.8.8.4 1.6 1.1 2 2.1-1.7.6-3.8.9-6.7.9s-5-.3-6.7-.9c.4-1 .9-1.7 2-2.1Z" />
+          <path d="M9 4.8c.9-.7 2-1.1 3-1.1s2.1.4 3 1.1" />
+        </svg>
+      </div>
+      <span class="section-kicker">QQ GROUPS</span>
+      <h2 id="qq-title">加入交流群</h2>
+      <p>点击群号即可复制，方便在 QQ 中搜索加入。</p>
+      <div class="qq-group-list">
+        <button class="qq-group-item" type="button" data-qq-number="746577276">
+          <span>计算所</span><strong>746577276</strong><span class="qq-copy-status">复制</span>
+        </button>
+        <button class="qq-group-item" type="button" data-qq-number="587081553">
+          <span>软件所</span><strong>587081553</strong><span class="qq-copy-status">复制</span>
+        </button>
+        <button class="qq-group-item" type="button" data-qq-number="1083153754">
+          <span>信工所</span><strong>1083153754</strong><span class="qq-copy-status">复制</span>
         </button>
       </div>
     </dialog>
