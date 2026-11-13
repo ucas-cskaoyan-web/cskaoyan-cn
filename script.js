@@ -1,8 +1,7 @@
-import { siteCardConfig } from "./site-config.js?v=20261015-qq-groups-2";
+import { siteCardConfig } from "./site-config.js?v=20261113-articles-1";
 
 const state = {
   sites: [],
-  health: new Map(),
   clickCounts: new Map(),
   heatCounts: new Map(),
   lastClickAt: new Map(),
@@ -66,6 +65,7 @@ function getClickVisitorId() {
     return "session";
   }
 }
+
 const fallbackTheme = { color: "#6750a4", aura: "#eaddff" };
 const defaultCard = {
   variant: "standard",
@@ -183,6 +183,7 @@ function parseSites(markdown) {
       sites.push({
         ...current,
         description: description.length ? description : ["暂无介绍。"],
+        articleBody: current.articleBody.map(inlineText).filter(Boolean),
         card: resolveCardConfig(current),
       });
     }
@@ -199,12 +200,18 @@ function parseSites(markdown) {
         name: "",
         url: "",
         description: [],
+        articleBody: [],
         order: sites.length,
       };
       return;
     }
 
     if (!current || !line) return;
+
+    if (line === "### 正文") {
+      current.inArticleBody = true;
+      return;
+    }
 
     if (!current.url) {
       const link = normalizeMarkdownLink(line);
@@ -222,7 +229,7 @@ function parseSites(markdown) {
       return;
     }
 
-    current.description.push(line);
+    (current.inArticleBody ? current.articleBody : current.description).push(line);
   });
 
   commitCurrent();
@@ -527,8 +534,13 @@ function buildLegacyGuideTitle(name) {
   ];
 }
 
-function getVisibleSites() {
-  return [...state.sites].sort((a, b) => a.order - b.order);
+function articleTitle(site) {
+  const name = site.name.replace(/考研报考指南$|报考指南$/, "");
+  return `${name}历年考研分数线整理`;
+}
+
+function articleUrl(site) {
+  return `?article=${encodeURIComponent(site.shortName)}`;
 }
 
 function renderStructuredData(sites) {
@@ -541,29 +553,21 @@ function renderStructuredData(sites) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "@id": "https://cskaoyan.cn/#site-list",
-    name: "国科大计算机考研院所专题站",
-    description: "国科大及中国科学院相关院所的计算机考研报考信息站点列表。",
+    name: "备考资料文章",
     numberOfItems: sites.length,
     itemListElement: sites.map((site, index) => ({
       "@type": "ListItem",
       position: index + 1,
       item: {
-        "@type": "WebSite",
-        name: site.name,
-        alternateName: site.shortName,
-        url: site.url,
-        description: site.description.join(" "),
+        "@type": "Article",
+        name: articleTitle(site),
+        url: new URL(articleUrl(site), "https://cskaoyan.cn/").href,
+        description: (site.articleBody.length ? site.articleBody : site.description).join(" "),
         inLanguage: "zh-CN",
       },
     })),
   });
   document.head.append(schema);
-}
-
-function applyHealthState(siteId, status) {
-  document.querySelectorAll(`[data-site-id="${siteId}"] .site-health`).forEach((badge) => {
-    updateHealthBadge(badge, status);
-  });
 }
 
 function formatClickCount(value) {
@@ -696,49 +700,6 @@ function trackSiteClick(counterId) {
     .catch(() => {});
 }
 
-function updateHealthBadge(badge, status) {
-  badge.classList.remove("is-checking", "is-online", "is-offline");
-  badge.classList.add(`is-${status}`);
-
-  const label = badge.querySelector(".health-label");
-  if (status === "online") {
-    label.textContent = "可访问";
-    badge.title = "网站连接正常";
-  } else if (status === "offline") {
-    label.textContent = "检测异常";
-    badge.title = "暂时无法建立连接，目标网站仍可能正常运行";
-  } else {
-    label.textContent = "检测中";
-    badge.title = "正在检测网站连通性";
-  }
-}
-
-async function checkSiteHealth(site) {
-  if (state.health.has(site.order)) {
-    applyHealthState(site.order, state.health.get(site.order));
-    return;
-  }
-
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 8000);
-  const healthUrl = new URL("/favicon.ico", site.url);
-  healthUrl.searchParams.set("health-check", Date.now().toString());
-
-  try {
-    await fetch(healthUrl, {
-      mode: "no-cors",
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    state.health.set(site.order, "online");
-  } catch {
-    state.health.set(site.order, "offline");
-  } finally {
-    window.clearTimeout(timeout);
-    applyHealthState(site.order, state.health.get(site.order));
-  }
-}
-
 function appendTitleParts(title, parts) {
   if (!Array.isArray(parts) || !parts.length) {
     title.textContent = title.dataset.siteName ?? "";
@@ -802,9 +763,6 @@ function renderSiteCard(site) {
   title.dataset.siteName = site.name;
   appendTitleParts(title, config.titleParts);
 
-  const knownHealth = state.health.get(site.order);
-  if (knownHealth) updateHealthBadge(node.querySelector(".site-health"), knownHealth);
-
   const clickCount = node.querySelector(".site-click-count");
   const heat = node.querySelector(".site-heat");
   if (config.counterId) {
@@ -823,15 +781,14 @@ function renderSiteCard(site) {
   });
 
   const link = node.querySelector(".site-link");
-  link.href = site.url;
-  link.setAttribute("aria-label", `访问 ${site.name}`);
+  link.href = articleUrl(site);
+  link.setAttribute("aria-label", `阅读${articleTitle(site)}`);
   link.firstChild.textContent = `${config.linkLabel || "访问站点"} `;
-  link.addEventListener("click", () => trackSiteClick(config.counterId));
   return node;
 }
 
 function renderSites() {
-  const sites = getVisibleSites();
+  const sites = state.sites;
   const fragment = document.createDocumentFragment();
 
   elements.grid.replaceChildren();
@@ -840,19 +797,61 @@ function renderSites() {
   elements.grid.append(fragment);
   elements.grid.hidden = sites.length === 0;
   loadClickCounts(sites);
-  sites.forEach(checkSiteHealth);
+}
+
+function renderArticle(site) {
+  const article = document.querySelector("#study-article");
+  const title = articleTitle(site);
+  const intro = document.querySelector("#article-intro");
+  const reference = document.querySelector("#article-reference-link");
+  document.title = `${title} | 计算机考研信息站`;
+  document.querySelector('link[rel="canonical"]').href = new URL(articleUrl(site), "https://cskaoyan.cn/").href;
+  document.querySelector("#article-title").textContent = title;
+  const body = site.articleBody.length ? site.articleBody : site.description;
+  body.forEach((text) => {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = text;
+    intro.append(paragraph);
+  });
+  reference.href = site.url;
+  reference.textContent = `${site.shortName}备考资料与经验`;
+  reference.addEventListener("click", () => trackSiteClick(site.card.counterId));
+  const overview = document.querySelector("#score-overview");
+  document.querySelector("#article-references").before(overview);
+  overview.hidden = false;
+  article.hidden = false;
+  loadScoreOverview([site]);
 }
 
 async function loadSites() {
+  const articleName = new URLSearchParams(window.location.search).get("article");
+  if (articleName !== null) {
+    document.querySelector(".hero").hidden = true;
+    document.querySelector(".about").hidden = true;
+    document.querySelector("#site-list-heading").hidden = true;
+    document.querySelector(".click-count-note").hidden = true;
+    document.querySelector("#score-overview").hidden = true;
+    document.querySelector("#sites").classList.add("article-directory");
+    elements.scorePlans.forEach((view) => {
+      view.institutionFilter.closest("label").hidden = true;
+    });
+  }
+
   try {
     const response = await fetch("sites.md", { cache: "no-cache" });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     state.sites = parseSites(await response.text());
-    if (!state.sites.length) throw new Error("sites.md 中没有可显示的有效站点");
+    if (!state.sites.length) throw new Error("暂无可用资料");
 
+    if (articleName !== null) {
+      const site = state.sites.find(({ shortName }) => shortName === articleName);
+      if (!site) throw new Error("找不到这篇资料");
+      renderArticle(site);
+      elements.status.hidden = true;
+      return;
+    }
     elements.status.hidden = true;
-    elements.grid.hidden = false;
     renderStructuredData(state.sites);
     renderSites();
     loadScoreOverview(state.sites);
@@ -861,12 +860,12 @@ async function loadSites() {
     elements.grid.replaceChildren();
     elements.grid.hidden = true;
     elements.status.hidden = false;
-    elements.status.innerHTML = `
-      <div class="empty-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M12 8v5M12 17h.01"/><path d="M10.3 4.7 2.9 17.5A2 2 0 0 0 4.6 20h14.8a2 2 0 0 0 1.7-2.5L13.7 4.7a2 2 0 0 0-3.4 0Z"/></svg>
-      </div>
-      <p><strong>站点目录读取失败</strong><br><span>${error.message}</span></p>
-    `;
+    const message = document.createElement("p");
+    message.textContent = `资料读取失败（${error.message}）`;
+    const back = document.createElement("a");
+    back.href = "./#sites";
+    back.textContent = "返回资料列表";
+    elements.status.replaceChildren(message, back);
   }
 }
 
