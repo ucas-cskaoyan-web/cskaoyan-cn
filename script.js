@@ -1,4 +1,4 @@
-import { siteCardConfig } from "./site-config.js?v=20261113-articles-1";
+import { siteCardConfig } from "./site-config.js?v=20261118-subpages-1";
 
 const state = {
   sites: [],
@@ -534,9 +534,12 @@ function buildLegacyGuideTitle(name) {
   ];
 }
 
+function cleanInstitutionName(site) {
+  return site.name.replace(/考研报考指南$|报考指南$/, "");
+}
+
 function articleTitle(site) {
-  const name = site.name.replace(/考研报考指南$|报考指南$/, "");
-  return `${name}历年考研分数线整理`;
+  return `${cleanInstitutionName(site)}报考速览与历年分数线`;
 }
 
 function articleUrl(site) {
@@ -799,28 +802,421 @@ function renderSites() {
   loadClickCounts(sites);
 }
 
+function createSvgIcon(pathData) {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", pathData);
+  svg.append(path);
+  return svg;
+}
+
+function extractHostname(url) {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
+function buildArticlePortal(site, articleCfg) {
+  const portalCfg = articleCfg.portal ?? {};
+  const portal = document.createElement("a");
+  portal.className = "article-portal";
+  portal.id = "article-reference-link";
+  portal.href = site.url;
+  portal.target = "_blank";
+  portal.rel = "noreferrer";
+  portal.addEventListener("click", () => trackSiteClick(site.card.counterId));
+
+  const topline = document.createElement("div");
+  topline.className = "portal-topline";
+
+  const badge = document.createElement("span");
+  badge.className = "portal-badge";
+  badge.textContent = "拓展阅读";
+
+  const domain = document.createElement("span");
+  domain.className = "portal-domain";
+  domain.textContent = extractHostname(site.url);
+
+  topline.append(badge, domain);
+
+  if (site.card.counterId) {
+    const heat = document.createElement("span");
+    heat.className = "portal-heat is-loading";
+    heat.dataset.heatCounterId = site.card.counterId;
+    heat.textContent = "读取热度";
+    topline.append(heat);
+  }
+
+  const title = document.createElement("strong");
+  title.className = "portal-title";
+  title.textContent = portalCfg.title || `${site.shortName}备考资料与经验站`;
+
+  const desc = document.createElement("p");
+  desc.className = "portal-desc";
+  desc.textContent = portalCfg.desc || "前往对应专题站查阅完整招生数据、复试考核细则与上岸经验。";
+
+  portal.append(topline, title, desc);
+
+  if (Array.isArray(portalCfg.tags) && portalCfg.tags.length) {
+    const tags = document.createElement("div");
+    tags.className = "portal-tags";
+    portalCfg.tags.forEach((tagText) => {
+      const tag = document.createElement("span");
+      tag.className = "portal-tag";
+      tag.textContent = tagText;
+      tags.append(tag);
+    });
+    portal.append(tags);
+  }
+
+  const actionRow = document.createElement("div");
+  actionRow.className = "portal-action-row";
+
+  const note = document.createElement("span");
+  note.className = "portal-note";
+  note.textContent = "考生公益整理 · 非官方";
+
+  const cta = document.createElement("span");
+  cta.className = "portal-cta";
+  const ctaLabel = document.createElement("span");
+  ctaLabel.textContent = portalCfg.cta || `前往${site.shortName}专题站`;
+  cta.append(ctaLabel, createSvgIcon("M7 17 17 7M8 7h9v9"));
+
+  actionRow.append(note, cta);
+  portal.append(actionRow);
+  return portal;
+}
+
+function buildArticleHighlights(articleCfg) {
+  const items = articleCfg.highlights;
+  if (!Array.isArray(items) || !items.length) return null;
+
+  const layout = articleCfg.layout || "metrics";
+  const section = document.createElement("section");
+  section.className = `article-highlights article-highlights--${layout}`;
+
+  if (articleCfg.highlightsTitle) {
+    const heading = document.createElement("div");
+    heading.className = "article-section-label";
+    heading.textContent = articleCfg.highlightsTitle;
+    section.append(heading);
+  }
+
+  const grid = document.createElement("div");
+  grid.className = `highlights-grid highlights-grid--${layout}`;
+
+  items.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "highlight-item";
+
+    if (layout === "metrics") {
+      const val = document.createElement("strong");
+      val.className = "metric-value";
+      val.textContent = item.value;
+      const label = document.createElement("span");
+      label.className = "metric-label";
+      label.textContent = item.label;
+      const note = document.createElement("small");
+      note.className = "metric-note";
+      note.textContent = item.note;
+      card.append(val, label, note);
+    } else if (layout === "modules") {
+      const code = document.createElement("span");
+      code.className = "module-code";
+      code.textContent = item.code;
+      const title = document.createElement("strong");
+      title.className = "module-title";
+      title.textContent = item.title;
+      const desc = document.createElement("p");
+      desc.className = "module-desc";
+      desc.textContent = item.desc;
+      card.append(code, title, desc);
+    } else if (layout === "roadmap") {
+      const step = document.createElement("span");
+      step.className = "roadmap-step";
+      step.textContent = item.step;
+      const title = document.createElement("strong");
+      title.className = "roadmap-title";
+      title.textContent = item.title;
+      const desc = document.createElement("p");
+      desc.className = "roadmap-desc";
+      desc.textContent = item.desc;
+      card.append(step, title, desc);
+    } else if (layout === "qa") {
+      const q = document.createElement("strong");
+      q.className = "qa-question";
+      const qTag = document.createElement("span");
+      qTag.className = "qa-badge";
+      qTag.textContent = "Q";
+      q.append(qTag, document.createTextNode(item.q));
+      const a = document.createElement("p");
+      a.className = "qa-answer";
+      a.textContent = item.a;
+      card.append(q, a);
+    } else if (layout === "tracks") {
+      const top = document.createElement("div");
+      top.className = "track-top";
+      const badge = document.createElement("span");
+      badge.className = "track-badge";
+      badge.textContent = item.badge;
+      const score = document.createElement("strong");
+      score.className = "track-score";
+      score.textContent = item.value;
+      top.append(badge, score);
+      const title = document.createElement("div");
+      title.className = "track-title";
+      title.textContent = item.title;
+      const note = document.createElement("small");
+      note.className = "track-note";
+      note.textContent = item.note;
+      card.append(top, title, note);
+    }
+
+    grid.append(card);
+  });
+
+  section.append(grid);
+  return section;
+}
+
+async function loadArticleScores(site, container) {
+  const currentYear = new Date().getFullYear();
+  const planLabels = {
+    normal: "普通计划",
+    soldier: "士兵计划",
+    minority: "少干计划",
+  };
+
+  let markdown = "";
+  try {
+    const response = await fetch(resolveScoreFile(site), { cache: "no-cache" });
+    if (response.ok) markdown = await response.text();
+  } catch {
+    markdown = "";
+  }
+
+  const availablePlans = scorePlanDefinitions
+    .map((plan) => ({
+      id: plan.id,
+      label: planLabels[plan.id] || plan.headings[0],
+      rows: markdown ? getRecentScoreRows(parseScoreMarkdown(markdown, site, plan.id)) : [],
+    }))
+    .filter((plan) => plan.rows.length > 0);
+
+  container.replaceChildren();
+
+  const head = document.createElement("div");
+  head.className = "article-scores-head";
+
+  const titleWrap = document.createElement("div");
+  titleWrap.className = "article-scores-title";
+  const h2 = document.createElement("h2");
+  h2.textContent = "近三年复试分数线";
+  const range = document.createElement("span");
+  range.className = "article-scores-range";
+  range.textContent = `${currentYear - 2}–${currentYear}`;
+  titleWrap.append(h2, range);
+  head.append(titleWrap);
+
+  const tableHost = document.createElement("div");
+  tableHost.className = "article-scores-table-wrap";
+
+  function renderPlanTable(plan) {
+    tableHost.replaceChildren();
+    if (!plan) {
+      const empty = document.createElement("p");
+      empty.className = "article-scores-empty";
+      empty.textContent = "近三年暂无已录入的分数线数据。";
+      tableHost.append(empty);
+      return;
+    }
+
+    const showMajor = plan.rows.some(
+      (row) => row.majorName && row.majorName !== "-" && row.majorName !== "未注明专业",
+    );
+    const columns = [
+      { label: "年份", get: (r) => r.year },
+      { label: "类型", get: (r) => r.degreeType },
+      ...(showMajor ? [{ label: "专业 / 方向", get: (r) => r.majorName }] : []),
+      { label: "科目代码", get: (r) => r.professionalCourseCode },
+      { label: "政治", get: (r) => r.politics },
+      { label: "英语", get: (r) => r.english },
+      { label: "数学", get: (r) => r.math },
+      { label: "专业课", get: (r) => r.professionalCourseScore },
+      { label: "总分线", get: (r) => r.totalLine, isTotal: true },
+    ];
+
+    const table = document.createElement("table");
+    table.className = "article-score-table";
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    columns.forEach((col) => {
+      const th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = col.label;
+      headRow.append(th);
+    });
+    thead.append(headRow);
+
+    const tbody = document.createElement("tbody");
+    plan.rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      columns.forEach((col) => {
+        const td = document.createElement("td");
+        td.dataset.label = col.label;
+        if (col.isTotal) td.className = "is-total-cell";
+        td.textContent = col.get(row);
+        if (col.isTotal && row.sourceUrl) {
+          const src = document.createElement("a");
+          src.href = row.sourceUrl;
+          src.target = "_blank";
+          src.rel = "noreferrer";
+          src.className = "score-source";
+          src.textContent = row.source || "来源";
+          td.append(document.createTextNode(" "), src);
+        }
+        tr.append(td);
+      });
+      tbody.append(tr);
+    });
+
+    table.append(thead, tbody);
+    tableHost.append(table);
+  }
+
+  if (availablePlans.length > 1) {
+    const tabs = document.createElement("div");
+    tabs.className = "article-plan-tabs";
+    tabs.setAttribute("role", "tablist");
+
+    availablePlans.forEach((plan, index) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.role = "tab";
+      btn.className = `article-plan-tab${index === 0 ? " is-active" : ""}`;
+      btn.setAttribute("aria-selected", index === 0 ? "true" : "false");
+      btn.textContent = plan.label;
+      btn.addEventListener("click", () => {
+        tabs.querySelectorAll(".article-plan-tab").forEach((node) => {
+          node.classList.toggle("is-active", node === btn);
+          node.setAttribute("aria-selected", node === btn ? "true" : "false");
+        });
+        renderPlanTable(plan);
+      });
+      tabs.append(btn);
+    });
+
+    head.append(tabs);
+  }
+
+  renderPlanTable(availablePlans[0] || null);
+
+  const foot = document.createElement("div");
+  foot.className = "article-scores-foot";
+  const legend = document.createElement("span");
+  legend.textContent = "“-” 表示不设单科限制，“？” 表示数据暂缺";
+
+  const moreLink = document.createElement("a");
+  moreLink.className = "article-more-link";
+  moreLink.href = site.url;
+  moreLink.target = "_blank";
+  moreLink.rel = "noreferrer";
+  moreLink.textContent = `更多录取明细与经验见${site.shortName}拓展阅读 ↗`;
+  moreLink.addEventListener("click", () => trackSiteClick(site.card.counterId));
+
+  foot.append(legend, moreLink);
+  container.append(head, tableHost, foot);
+}
+
 function renderArticle(site) {
   const article = document.querySelector("#study-article");
   const title = articleTitle(site);
-  const intro = document.querySelector("#article-intro");
-  const reference = document.querySelector("#article-reference-link");
+  const articleCfg = site.card?.article ?? {};
+  const theme = site.card?.theme ?? defaultCard.theme;
+
   document.title = `${title} | 计算机考研信息站`;
   document.querySelector('link[rel="canonical"]').href = new URL(articleUrl(site), "https://cskaoyan.cn/").href;
-  document.querySelector("#article-title").textContent = title;
-  const body = site.articleBody.length ? site.articleBody : site.description;
-  body.forEach((text) => {
-    const paragraph = document.createElement("p");
-    paragraph.textContent = text;
-    intro.append(paragraph);
-  });
-  reference.href = site.url;
-  reference.textContent = `${site.shortName}备考资料与经验`;
-  reference.addEventListener("click", () => trackSiteClick(site.card.counterId));
-  const overview = document.querySelector("#score-overview");
-  document.querySelector("#article-references").before(overview);
-  overview.hidden = false;
+
+  article.replaceChildren();
+  article.dataset.articleStyle = articleCfg.style || "default";
+  article.style.setProperty("--article-accent", theme.color);
+  article.style.setProperty("--article-aura", theme.aura);
+
+  const topbar = document.createElement("div");
+  topbar.className = "article-topbar";
+
+  const back = document.createElement("a");
+  back.className = "article-back";
+  back.href = "./#sites";
+  back.append(createSvgIcon("M19 12H5M11 18l-6-6 6-6"), document.createTextNode("返回资料列表"));
+
+  const disclaimer = document.createElement("span");
+  disclaimer.className = "article-disclaimer";
+  disclaimer.textContent = "个人资料整理 · 招生政策以院所官方公告为准";
+  topbar.append(back, disclaimer);
+
+  const stage = document.createElement("section");
+  stage.className = "article-stage";
+
+  if (articleCfg.windowTitle) {
+    const winBar = document.createElement("div");
+    winBar.className = "article-window-bar";
+    winBar.setAttribute("aria-hidden", "true");
+    const dots = document.createElement("div");
+    dots.className = "window-dots";
+    dots.append(document.createElement("span"), document.createElement("span"), document.createElement("span"));
+    const winTitle = document.createElement("span");
+    winTitle.className = "window-title";
+    winTitle.textContent = articleCfg.windowTitle;
+    winBar.append(dots, winTitle);
+    stage.append(winBar);
+  }
+
+  const heroGrid = document.createElement("div");
+  heroGrid.className = "article-hero-grid";
+
+  const lead = document.createElement("div");
+  lead.className = "article-lead";
+
+  const kicker = document.createElement("span");
+  kicker.className = "article-kicker";
+  kicker.textContent = articleCfg.kicker || `${site.shortName} · 备考速览`;
+
+  const h1 = document.createElement("h1");
+  h1.id = "article-title";
+  h1.textContent = cleanInstitutionName(site);
+
+  const subtitle = document.createElement("p");
+  subtitle.className = "article-subtitle";
+  subtitle.textContent = articleCfg.subtitle || site.articleBody[0] || site.description[0] || "";
+
+  lead.append(kicker, h1, subtitle);
+  heroGrid.append(lead, buildArticlePortal(site, articleCfg));
+  stage.append(heroGrid);
+
+  article.append(topbar, stage);
+
+  const highlights = buildArticleHighlights(articleCfg);
+  if (highlights) {
+    article.append(highlights);
+  }
+
+  const scoreSection = document.createElement("section");
+  scoreSection.className = "article-scores";
+  const loadingHint = document.createElement("p");
+  loadingHint.className = "article-scores-empty";
+  loadingHint.textContent = "正在读取分数线…";
+  scoreSection.append(loadingHint);
+  article.append(scoreSection);
+
   article.hidden = false;
-  loadScoreOverview([site]);
+  window.scrollTo({ top: 0, behavior: "instant" });
+  loadClickCounts([site]);
+  loadArticleScores(site, scoreSection);
 }
 
 async function loadSites() {
@@ -832,9 +1228,6 @@ async function loadSites() {
     document.querySelector(".click-count-note").hidden = true;
     document.querySelector("#score-overview").hidden = true;
     document.querySelector("#sites").classList.add("article-directory");
-    elements.scorePlans.forEach((view) => {
-      view.institutionFilter.closest("label").hidden = true;
-    });
   }
 
   try {
